@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/qss">
+        <file>qss/MainWidget.qss</file>
+        <file>qss/AdvanceFunctionWidget.qss</file>
+        <file>qss/ControlPannelWidget.qss</file>
+        <file>qss/FileBackupWidget.qss</file>
+        <file>qss/FileRecoveryWidget.qss</file>
+        <file>qss/FirmwareUpdateWidget.qss</file>
+        <file>qss/ServoParameterWidget.qss</file>
+        <file>qss/SystemToolWidget.qss</file>
+        <file>qss/TitleBarWidget.qss</file>
+    </qresource>
+    <qresource prefix="/res"/>
+</RCC>
