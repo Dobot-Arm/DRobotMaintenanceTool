@@ -1,0 +1,6 @@
+A1:=LREAL:=GVL.rt_AxisPos[0]:=0.0
+A2:=LREAL:=GVL.rt_AxisPos[1]:=0.0
+A3:=LREAL:=GVL.rt_AxisPos[2]:=0.0
+A4:=LREAL:=GVL.rt_AxisPos[3]:=0.0
+A5:=LREAL:=GVL.rt_AxisPos[4]:=0.0
+A6:=LREAL:=GVL.rt_AxisPos[5]:=0.0

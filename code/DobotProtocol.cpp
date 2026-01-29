@@ -2,11 +2,13 @@
 #include <QTimer>
 DobotProtocol::DobotProtocol()
 {
-    m_httpManager = new DHttpManager();
+    m_httpManager = new DHttpCurlManager();
+    m_getCRStatusHttpManager = new DHttpCurlManager();//new DHttpManager();
+    m_getConnectionStateHttpManager = new DHttpCurlManager();//
 }
 ConnectState DobotProtocol::getConnectionState(QString ip)
 {
-    QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22000"+"/connection/state",2000);
+    QByteArray getReply = m_getConnectionStateHttpManager->httpManagerGet("http://"+ip+":22000"+"/connection/state",2000);
     if(getReply.isEmpty())
     {
         return ConnectState::unconnected;
@@ -30,7 +32,7 @@ ConnectState DobotProtocol::getConnectionState(QString ip)
 DobotType::SettingsVersion DobotProtocol::getSettingsVersion(QString ip)
 {
     QByteArray postReply = m_httpManager->httpManagerGet("http://"+ip+":22000"+"/settings/version");
-    qDebug()<<"postReply  " <<postReply;
+    qDebug()<<"/settings/version  getReply  " <<postReply;
     DobotType::SettingsVersion settingsVersion;
     if(postReply.isEmpty())
     {
@@ -73,7 +75,7 @@ DobotType::SettingsVersion DobotProtocol::getSettingsVersion(QString ip)
 DobotType::SettingsVersion DobotProtocol::postSettingsVersion(QString ip, QString postData)
 {
     QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22000"+"/settings/version",postData);
-    qDebug()<<"postReply  " <<postReply;
+    qDebug()<<"/settings/version  postReply  " <<postReply;
     DobotType::SettingsVersion settingsVersion;
     if(postReply.isEmpty())
     {
@@ -123,55 +125,34 @@ DobotType::ControllerType DobotProtocol::getControllerType(QString ip)
     QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
     QJsonObject jsonObject = jsonDoc.object();
     controllerType.name = jsonObject.value("name").toString();
+    controllerType.nameExt = jsonObject.value("controllerTypeExt").toString();
     controllerType.version = jsonObject.value("version").toInt();
-
+    controllerType.originName = controllerType.name;
+    if (!controllerType.nameExt.isEmpty()
+        && controllerType.nameExt.startsWith("CR")
+        && controllerType.nameExt.endsWith("A-IS"))
+    {
+        qDebug()<<"controllerTypeExt不是空,且是CRxxxA-IS系列的，所以name要被替换为controllerTypeExt";
+        controllerType.name = controllerType.nameExt;
+    }
     return controllerType;
 }
 
-
-
-PropertiesCabinetType DobotProtocol::getPropertiesCabinetType(QString ip)
+DobotType::CabinetType DobotProtocol::getPropertiesCabinetType(QString ip)
 {
     QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22000"+"/properties/cabinetType");
+    qDebug()<<"/properties/cabinetType getReply  " <<getReply;
+    DobotType::CabinetType cabinetType;
+    cabinetType.name = "CC162";
     if(getReply.isEmpty())
     {
-        return PropertiesCabinetType::CC162;
+        return cabinetType;
     }
     QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
     QJsonObject jsonObject = jsonDoc.object();
-    if(jsonObject.contains("name")){
-      QString connectState = jsonObject.value("name").toString();
-      if(connectState == "CCBOX"){
-          return PropertiesCabinetType::CCBOX;
-      }else if(connectState == "CC162"){
-          return PropertiesCabinetType::CC162;
-      }else if(connectState == "CC262"){
-          return PropertiesCabinetType::CC262;
-      }else if(connectState == "MG400"){
-          return PropertiesCabinetType::MG400;
-      }else if(connectState == "M1Pro"){
-          return PropertiesCabinetType::M1Pro;
-      }else if(connectState == "MG6"){
-          return PropertiesCabinetType::MG6;
-      }
-    }
-    return PropertiesCabinetType::CC162;
-}
-
-QString DobotProtocol::getPropertiesCabinetTypeStr(QString ip)
-{
-    QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22000"+"/properties/cabinetType");
-    if(getReply.isEmpty())
-    {
-        return "CC162";
-    }
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
-    QJsonObject jsonObject = jsonDoc.object();
-    if(jsonObject.contains("name")){
-      QString cabinetType = jsonObject.value("name").toString();
-      return cabinetType;
-    }
-    return "CC162";
+    cabinetType.name = jsonObject.value("name").toString("CC162");
+    cabinetType.power = jsonObject.value("power").toString();
+    return cabinetType;
 }
 
 DobotType::ProtocolExchangeResult DobotProtocol::getProtocolExchange(QString ip)
@@ -187,47 +168,107 @@ DobotType::ProtocolExchangeResult DobotProtocol::getProtocolExchange(QString ip)
     QJsonObject jsonObject = jsonDoc.object();
 
     protocolExchange.prjState = jsonObject["prjState"].toString();
+    protocolExchange.controlMode = jsonObject["controlMode"].toString();
+    protocolExchange.dragMode = jsonObject.value("dragMode").toString();
+    protocolExchange.dragPlayback = jsonObject.value("dragPlayback").toBool();
+    protocolExchange.powerState = jsonObject.value("powerState").toString();
+    protocolExchange.coordinate = jsonObject.value("coordinate").toString();
+    protocolExchange.isSafeSuspend = jsonObject.value("isSafeSuspend").toInt();
 
     QJsonArray array = jsonObject["alarms"].toArray();
     for (int i = 0; i < array.size(); i++)
     {
+        QList<int> subAlarms;
         QJsonArray arrayChild = array.at(i).toArray();
         for (int j = 0; j < arrayChild.size(); j++)
         {
             if(arrayChild.at(j).isNull()){
                 continue;
             }
+            subAlarms.append(arrayChild.at(j).toInt());
             if(arrayChild.at(j).toInt() != 0){
                 protocolExchange.isAlarm = true;
             }
         }
+        protocolExchange.alarms.append(subAlarms);
     }
-
     return protocolExchange;
 }
 
-QString DobotProtocol::postFaultCheck(QString ip, QString postData)
+QList<QPair<QString, QString> > DobotProtocol::getNetworkCardMac(QString ip)
 {
+    QList<QPair<QString, QString>> ret;
+    QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22002"+"/control/networkCardMAC");
+    qDebug()<<"getReply /control/networkCardMAC: "<<getReply;
+    if(getReply.isEmpty())
+    {
+        return ret;
+    }
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
+    QJsonArray arr = jsonDoc.array();
+    for (int i=0; i<arr.size(); ++i)
+    {
+        auto obj = arr.at(i).toObject();
+        QString strName = obj["Name"].toString();
+        QString strMac = obj["MAC"].toString();
+        if (!strName.isEmpty() || !strMac.isEmpty())
+        {
+            ret.append({strName,strMac});
+        }
+    }
+    return ret;
+}
+
+DobotType::StructFaultCheck DobotProtocol::postFaultCheck(QString ip, QString postData)
+{
+    DobotType::StructFaultCheck faultCheck;
     QJsonObject jsonFunc;
     jsonFunc.insert("operationType", postData);
+    if(postData == "files"||postData == "dns")
+    {
+        jsonFunc.insert("control", CommonData::getCurrentSettingsVersion().control);
+    }
     postData = QString(QJsonDocument(jsonFunc).toJson());
-    qDebug()<<" postFaultCheck "<<postData;
+    qDebug()<<"/fault/check postFaultCheck "<<postData;
     QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/fault/check",postData);
-    qDebug()<<"  postReply "<<postReply;
+    qDebug()<<"/fault/check  postReply "<<postReply;
     if(postReply.isEmpty())
     {
-        return QString();
+        return faultCheck;
     }
     QJsonDocument jsonDoc = QJsonDocument::fromJson(postReply);
     QJsonObject jsonObject = jsonDoc.object();
 
+    faultCheck.result = jsonObject.value("result").toString();
+    QStringList strListMissFiles;
+    QJsonArray jsonArray = jsonObject.value("missingFiles").toArray();
+    for(int i = 0; i < jsonArray.count();i++)
+    {
+        strListMissFiles.append(jsonArray[i].toString());
+    }
+    faultCheck.missFiles = strListMissFiles;
     /*** data **/
-    return jsonObject.value("result").toString();
+    return faultCheck;
+}
+
+FaultCheckResult DobotProtocol::postFaultCheck(const QString &strIP, const FaultCheckData &data, int iTimeoutMilliseconds)
+{
+    FaultCheckResult result;
+    QString strUrl = QString("http://%1:22002/fault/check").arg(strIP);
+    QString strPostData=data.toJsonString();
+    QByteArray postReply = m_httpManager->httpManagerPost(strUrl, strPostData,iTimeoutMilliseconds);
+    qDebug()<<"postReply  postFaultCheck " <<postReply;
+    if (!postReply.isEmpty())
+    {
+        result.fromJson(QString(postReply));
+    }
+    return result;
 }
 
 QStringList DobotProtocol::getXmlVersion(QString ip)
 {
     QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22002"+"/update/xmlVersion");
+    qDebug()<<"getReply  /update/xmlVersion " <<getReply;
     if(getReply.isEmpty())
     {
         return QStringList();
@@ -246,7 +287,7 @@ QStringList DobotProtocol::getXmlVersion(QString ip)
     return strList;
 }
 
-QString DobotProtocol::postFaultRepair(QString ip, QString postData,QString macAddress,QString date,QString time)
+QString DobotProtocol::postFaultRepair(QString ip, QString postData,QString macAddress,QString date,QString time,QString control)
 {
     QJsonObject jsonFunc;
 //    macAddress.insert(0,"000");
@@ -279,6 +320,11 @@ QString DobotProtocol::postFaultRepair(QString ip, QString postData,QString macA
     {
         jsonFunc.insert("time", time);
     }
+
+    if(!control.isEmpty())
+    {
+        jsonFunc.insert("control",control);
+    }
     jsonFunc.insert("operationType", postData);
     postData = QString(QJsonDocument(jsonFunc).toJson());
     QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/fault/repair",postData);
@@ -293,8 +339,6 @@ QString DobotProtocol::postFaultRepair(QString ip, QString postData,QString macA
     /*** data **/
     return jsonObject.value("result").toString();
 }
-
-
 
 void DobotProtocol::setCurrentIp(QString ip)
 {
@@ -322,6 +366,7 @@ QString DobotProtocol::postUpdateDiskCheck(QString ip)
     jsonFunc.insert("operationType", "checkP5");
     QString postData = QString(QJsonDocument(jsonFunc).toJson());
     QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/update/diskCheck",postData);
+    qDebug()<<"postReply  /update/diskCheck " <<postReply;
     if(postReply.isEmpty())
     {
         return QString();
@@ -347,15 +392,29 @@ QString DobotProtocol::postUpdateCRSingleFwAndXml(QString ip,DobotType::StructCR
         jsonFunc.insert("cabType", singleCRFwAndXml.cabType);
         jsonFunc.insert("cabVersion",singleCRFwAndXml.cabVersion);
         jsonFunc.insert("updateType",singleCRFwAndXml.updateType);
-        jsonFunc.insert("updateFile",singleCRFwAndXml.updateFile);
-        jsonFunc.insert("updateFile2",singleCRFwAndXml.updateFile2);
+        while (singleCRFwAndXml.allUpdateFile.size()<2){
+            singleCRFwAndXml.allUpdateFile.append(QString(""));
+        }
+        for (int i=0; i<singleCRFwAndXml.allUpdateFile.size(); ++i)
+        {
+            if (i==0){
+                jsonFunc.insert("updateFile",singleCRFwAndXml.allUpdateFile.at(i));
+            }else{
+                jsonFunc.insert(QString("updateFile%1").arg(i+1),singleCRFwAndXml.allUpdateFile.at(i));
+            }
+        }
         jsonFunc.insert("slaveId", singleCRFwAndXml.slaveId);
     }
 
+    if(singleCRFwAndXml.slaveId == 0)
+    {
+        jsonFunc.insert("updateControlVersion", singleCRFwAndXml.updateControlVersion);
+    }
+
     QString postData = QString(QJsonDocument(jsonFunc).toJson());
-    qDebug()<<"http://"+ip+":22002"+"/update/CR/singleFwAndXml";
-    QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/update/CR/singleFwAndXml",postData);
-    qDebug().noquote()<<"/update/CR/singleFwAndXml  "<<postData.toUtf8();
+    qDebug()<<"/update/CR/singleFwAndXml    "<<postData.toUtf8();
+    QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/update/CR/singleFwAndXml",postData,15000);
+    qDebug().noquote()<<"/update/CR/singleFwAndXml  postReply   "<<postReply;
     if(postReply.isEmpty())
     {
         return QString();
@@ -377,9 +436,9 @@ QString DobotProtocol::postUpdateM1ProSingleFwAndXml(QString ip, DobotType::Stru
 
 
     QString postData = QString(QJsonDocument(jsonFunc).toJson());
-    qDebug()<<"http://"+ip+":22002"+"/update/M1Pro/singleFwAndXml";
-    QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/update/M1Pro/singleFwAndXml",postData);
     qDebug()<<"/update/M1Pro/singleFwAndXml  "<<postData.toUtf8();
+    QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/update/M1Pro/singleFwAndXml",postData);
+    qDebug()<<"/update/M1Pro/singleFwAndXml  postReply "<<postReply;
     if(postReply.isEmpty())
     {
         return QString();
@@ -402,9 +461,9 @@ QString DobotProtocol::postUpdateMG400SingleFwAndXml(QString ip, DobotType::Stru
 
 
     QString postData = QString(QJsonDocument(jsonFunc).toJson());
-    qDebug()<<"http://"+ip+":22002"+"/update/MG400/singleFwAndXml";
+    qDebug()<<"/update/MG400/singleFwAndXml   "<<postData.toUtf8();;
     QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/update/MG400/singleFwAndXml",postData);
-    qDebug()<<"/update/MG400/singleFwAndXml  "<<postData.toUtf8();
+    qDebug()<<"/update/MG400/singleFwAndXml  postReply  "<<postReply;
     if(postReply.isEmpty())
     {
         return QString();
@@ -432,14 +491,10 @@ bool DobotProtocol::postSettingsModifyServoParams(QString ip, DobotType::StructS
 
     jsonFunc.insert("body",jsonArray);
 
-
-
     QString postData = QString(QJsonDocument(jsonFunc).toJson());
-    qDebug()<<"http://"+ip+":22000"+"/settings/modifyServoParams";
-
     qDebug().noquote()<<"/settings/modifyServoParams  "<<postData.toUtf8();
-
     QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22000"+"/settings/modifyServoParams",postData);
+    qDebug()<<"/settings/modifyServoParams  postReply  "<<postReply;
     if(postReply.isEmpty())
     {
         return false;
@@ -454,14 +509,25 @@ bool DobotProtocol::postSettingsModifyServoParams(QString ip, DobotType::StructS
 DobotType::StructSettingsServoParamsResult DobotProtocol::getSettingsModifyServoParams(QString ip)
 {
     DobotType::StructSettingsServoParamsResult result;
-
-    QByteArray postReply = m_httpManager->httpManagerGet("http://"+ip+":22000"+"/settings/modifyServoParams");
-    if(postReply.isEmpty())
+    QByteArray getReply;
+    for (int i=0;i<5;++i)
+    {
+         getReply = m_httpManager->httpManagerGet("http://"+ip+":22000"+"/settings/modifyServoParams");
+        qDebug().noquote()<<"/settings/modifyServoParams getReply"<<getReply;
+        if(getReply.isEmpty())
+        {
+            sleep(5000);
+        }
+        else
+        {
+            break;
+        }
+    }
+    if(getReply.isEmpty())
     {
         return result;
     }
-    qDebug().noquote()<<" getSettingsModifyServoParams reply "<<postReply;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(postReply);
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
     QJsonObject jsonObject = jsonDoc.object();
     QJsonArray ServoParamResultJsonArray = jsonObject.value("body").toArray();
     for(int i = 0; i < ServoParamResultJsonArray.size();i++){
@@ -479,9 +545,7 @@ DobotType::StructSettingsServoParamsResult DobotProtocol::getSettingsModifyServo
 
 bool DobotProtocol::postSettingsReadServoParams(QString ip, DobotType::StructSettingsServoParams settingsServoParams)
 {
-
     QJsonObject jsonFunc;
-
     QJsonArray jsonArray;
     for(DobotType::StructServoParam servoParam: settingsServoParams.servoParams){
         QJsonObject jsonServoParam;
@@ -496,29 +560,38 @@ bool DobotProtocol::postSettingsReadServoParams(QString ip, DobotType::StructSet
     qDebug()<<"http://"+ip+":22000"+"/settings/readServoParams";
     qDebug().noquote()<<"postSettingsReadServoParams post -->  "<<postData;
     QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22000"+"/settings/readServoParams",postData);
+    qDebug()<<"/settings/readServoParams  postReply   "<<postReply;
     if(postReply.isEmpty())
     {
         return false;
     }
     QJsonDocument jsonDoc = QJsonDocument::fromJson(postReply);
     QJsonObject jsonObject = jsonDoc.object();
-
-
-
     return jsonObject.value("status").toBool();
-
 }
 
 DobotType::StructSettingsServoParamsResult DobotProtocol::getSettingsReadServoParams(QString ip)
 {
     DobotType::StructSettingsServoParamsResult result;
 
-    QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22000"+"/settings/readServoParams");
+    QByteArray getReply;
+    for (int i=0;i<5;++i)
+    {
+         getReply = m_httpManager->httpManagerGet("http://"+ip+":22000"+"/settings/readServoParams");
+        qDebug().noquote()<<"/settings/readServoParams getReply"<<getReply;
+        if(getReply.isEmpty())
+        {
+            sleep(5000);
+        }
+        else
+        {
+            break;
+        }
+    }
     if(getReply.isEmpty())
     {
         return result;
     }
-    qDebug().noquote()<<"getSettingsReadServoParams getReply"<<getReply;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
     QJsonObject jsonObject = jsonDoc.object();
     QJsonArray ServoParamResultJsonArray = jsonObject.value("body").toArray();
@@ -535,22 +608,106 @@ DobotType::StructSettingsServoParamsResult DobotProtocol::getSettingsReadServoPa
     /*** data **/
     return result;
 }
+
+QHash<QString, DobotType::StructServoValue> DobotProtocol::getReadServoValueDianjixinghao(QString ip)
+{
+    QHash<QString, //关节序号J1~J6
+            DobotType::StructServoValue
+         > lstResult;
+    const QString strUrl = QString("http://%1:22000/settings/readServoParams").arg(ip);
+    const QString strChangjia = "addr200101"; //H1.00   厂家
+    const QString strDianji = "addr200102"; //H1.01     电机型号
+    QJsonArray jsonArray;
+    for (int i=1;i<=6; ++i){
+        QJsonObject obj1;
+        obj1["key"] = strChangjia;
+        obj1["servoNum"] = QString("J%1").arg(i);
+        jsonArray.append(obj1);
+        QJsonObject obj2;
+        obj2["key"] = strDianji;
+        obj2["servoNum"] = QString("J%1").arg(i);
+        jsonArray.append(obj2);
+    }
+    QJsonObject jsObject;
+    jsObject["body"] = jsonArray;
+    QString postData = QString(QJsonDocument(jsObject).toJson());
+    qDebug().noquote()<<"getReadServoValueDianjixinghao send -->  "<<postData;
+    QByteArray postReply = m_httpManager->httpManagerPost(strUrl,postData);
+    qDebug()<<"getReadServoValueDianjixinghao  recv   "<<postReply;
+    if(postReply.isEmpty()) return lstResult;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(postReply);
+    jsObject = jsonDoc.object();
+    if (!jsObject.value("status").toBool()) return lstResult;
+
+    sleep(6000);
+
+    QByteArray getReply;
+    for (int i=0;i<5;++i)
+    {
+         getReply = m_httpManager->httpManagerGet(strUrl);
+        qDebug().noquote()<<"getReadServoValueDianjixinghao getReply"<<getReply;
+        if(getReply.isEmpty()){
+            sleep(5000);
+        }else{
+            break;
+        }
+    }
+    if(getReply.isEmpty()) return lstResult;
+
+    jsonDoc = QJsonDocument::fromJson(getReply);
+    jsObject = jsonDoc.object();
+    if (!jsObject.value("status").toBool()) return lstResult;
+
+    jsonArray = jsObject.value("body").toArray();
+    for(int i = 0; i < jsonArray.size();i++){
+        auto jo = jsonArray[i].toObject();
+        bool status = jo.value("status").toBool();
+        int v = jo.value("value").toInt();
+        QString joint = jo.value("servoNum").toString();
+        QString addr = jo.value("key").toString();
+        if (strChangjia == addr){
+            for (int jt=1; jt<=6; ++jt){
+                if (joint != QString::asprintf("J%d",jt)){
+                    continue;
+                }
+                auto itr = lstResult.find(joint);
+                if (itr==lstResult.end()){
+                    DobotType::StructServoValue data;
+                    data.jointId = jt;
+                    data.changjia = v;
+                    lstResult.insert(joint, data);
+                }else{
+                    itr->changjia = v;
+                }
+            }
+        }else if (strDianji == addr){
+            for (int jt=1; jt<=6; ++jt){
+                if (joint != QString::asprintf("J%d",jt)){
+                    continue;
+                }
+                auto itr = lstResult.find(joint);
+                if (itr==lstResult.end()){
+                    DobotType::StructServoValue data;
+                    data.jointId = jt;
+                    data.dianji = v;
+                    lstResult.insert(joint, data);
+                }else{
+                    itr->dianji = v;
+                }
+            }
+        }
+    }
+    return lstResult;
+}
+
 //http://192.168.5.1:22002/update/checkKernelVersion
 QString DobotProtocol::postUpdateCheckKernelVersion(QString ip,QString cabVersion)
 {
-
-
-
     QJsonObject jsonFunc;
     jsonFunc.insert("cabVersion",cabVersion);
-
     QString postData = QString(QJsonDocument(jsonFunc).toJson());
-
     QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/update/checkKernelVersion",postData);
     qDebug()<<"postReply  postUpdateCheckKernelVersion " <<postReply;
-
-
-
 
     if(postReply.isEmpty())
     {
@@ -559,19 +716,13 @@ QString DobotProtocol::postUpdateCheckKernelVersion(QString ip,QString cabVersio
 
     QJsonDocument jsonDoc = QJsonDocument::fromJson(postReply);
     QJsonObject jsonObject = jsonDoc.object();
-
-
-
     return jsonObject.value("result").toString();
-
-
-
 }
 //http://192.168.5.1:22002/update/checkPartitionOccupancy
 QString DobotProtocol::getUpdateCheckPartitionOccupancy(QString ip)
 {
 
-    QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22002"+"/update/checkPartitionOccupancy");
+    QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22002"+"/update/checkPartitionOccupancy",10000);
     qDebug()<<"getReply  /update/checkPartitionOccupancy " <<getReply;
 
     if(getReply.isEmpty())
@@ -581,8 +732,79 @@ QString DobotProtocol::getUpdateCheckPartitionOccupancy(QString ip)
 
     QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
     QJsonObject jsonObject = jsonDoc.object();
+    return jsonObject.value("result").toString();
+}
 
+bool DobotProtocol::postSettingsControlMode(QString ip, QString controlMode)
+{
+    QJsonObject jsonFunc;
+    jsonFunc.insert("controlMode",controlMode);
 
+    QString postData = QString(QJsonDocument(jsonFunc).toJson());
+
+    QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22000"+"/settings/controlMode",postData);
+    qDebug()<<"postReply  postSettingsControlMode " <<postReply;
+
+    if(postReply.isEmpty())
+    {
+        return false;
+    }
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(postReply);
+    QJsonObject jsonObject = jsonDoc.object();
+    return jsonObject.value("status").toBool();
+}
+
+QString DobotProtocol::getSettingsControlMode(QString ip)
+{
+    QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22000"+"/settings/controlMode");
+    qDebug()<<"getReply  /settings/controlMode " <<getReply;
+    if(getReply.isEmpty())
+    {
+        return "";
+    }
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
+    QJsonObject jsonObject = jsonDoc.object();
+    if(jsonObject.contains("controlMode")){
+      return jsonObject.value("controlMode").toString();
+    }
+    return "";
+}
+
+QString DobotProtocol::postUpdateKernel(QString ip, QString cabVersion)
+{
+
+    QJsonObject jsonFunc;
+    jsonFunc.insert("cabVersion",cabVersion);
+
+    QString postData = QString(QJsonDocument(jsonFunc).toJson());
+
+    QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/update/kernel",postData,10000);
+    qDebug()<<"postReply  postUpdateKernel " <<postReply;
+
+    if(postReply.isEmpty())
+    {
+        return "";
+    }
+
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(postReply);
+    QJsonObject jsonObject = jsonDoc.object();
+
+    return jsonObject.value("result").toString();
+}
+
+//用于当V4主控板升级后，备份从控制器传输到本地后，发送这个通知请求，通知嵌入式继续升级下一个板卡。
+QString DobotProtocol::postUpdateContinue(QString ip)
+{
+    QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/update/continue","");
+    qDebug()<<"postReply  postUpdateContinue " <<postReply;
+
+    if(postReply.isEmpty())
+    {
+        return "";
+    }
+
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(postReply);
+    QJsonObject jsonObject = jsonDoc.object();
 
     return jsonObject.value("result").toString();
 }
@@ -609,10 +831,13 @@ QString DobotProtocol::postUpdateCRFwAndXml(QString ip,DobotType::UpdateFirmware
 
     jsonFunc.insert("currentVersion",QJsonValue(jsonFuncCurrentVersion));
 
+    jsonFunc.insert("updateControlVersion",updateFirmware.updateControlVersion);
+
+
     QString postData = QString(QJsonDocument(jsonFunc).toJson());
-    qDebug()<<"http://"+ip+":22002"+"/update/CR/fwAndXml";
+    qDebug()<<"/update/CR/fwAndXml   "<<postData.toUtf8();
     QByteArray postReply = m_httpManager->httpManagerPost("http://"+ip+":22002"+"/update/CR/fwAndXml",postData);
-    qDebug().noquote()<<"/update/CR/fwAndXml "<<postData.toUtf8();
+    qDebug().noquote()<<"/update/CR/fwAndXml postReply  "<<postReply;
     if(postReply.isEmpty())
     {
         return QString();
@@ -624,25 +849,33 @@ QString DobotProtocol::postUpdateCRFwAndXml(QString ip,DobotType::UpdateFirmware
     return jsonObject.value("result").toString();
 }
 
-int DobotProtocol::getUpdateSingleStatus(QString ip)
+DobotType::StructGetCRSingleStatus DobotProtocol::getUpdateSingleStatus(QString ip)
 {
+    DobotType::StructGetCRSingleStatus singleStatus;
     QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22002"+"/update/singleStatus");
+    qDebug().noquote()<<"/update/singleStatus getReply  "<<getReply;
     if(getReply.isEmpty())
     {
-        qDebug()<<"getUpdateSingleStatus get no data 如果 CCBOX 会断电 所以默认成功 ";
-        return 2;
+        qDebug()<<"getUpdateSingleStatus get no data 如果 CCBOX MG6UniIO CC26X UniIO 会断电 所以默认成功 ";
+        singleStatus.result = 2;
+        return singleStatus;
     }
 
     QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
     QJsonObject jsonObject = jsonDoc.object();
     int status = jsonObject.value("result").toInt();
-    return status;
+
+    singleStatus.result = status;
+    singleStatus.errorCode = jsonObject.value("errorCode").toInt();
+    return singleStatus;
 }
 
 DobotType::UpdateStatus DobotProtocol::getUpdateCRStatus(QString ip)
 {
+    m_id++;
     DobotType::UpdateStatus updateStatus;
-    QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22002"+"/update/CR/status");
+    QByteArray getReply = m_getCRStatusHttpManager->httpManagerGet("http://"+ip+":22002"+"/update/CR/status",30000);
+    qDebug().noquote()<<"/update/CR/status getReply  "<<getReply;
     if(getReply.isEmpty())
     {
         updateStatus.bIsOutage = true;
@@ -659,25 +892,72 @@ DobotType::UpdateStatus DobotProtocol::getUpdateCRStatus(QString ip)
     for(int i = 0; i < XMLUpdateResultJsonArray.size();i++){
         updateStatus.XMLUpdateResult.append(XMLUpdateResultJsonArray[i].toInt());
     }
+
+    int errorCode = jsonObject.value("errorCode").toInt();
+    updateStatus.errorCode = errorCode;
+
+    updateStatus.backupInfo.path = jsonObject.value("backupInfo").toObject().value("path").toString();
+    updateStatus.backupInfo.status = jsonObject.value("backupInfo").toObject().value("status").toBool();
+
+
     return updateStatus;
 }
 
-QString DobotProtocol::getProtocolVersion(QString ip)
+DobotType::StructProtocolVersion DobotProtocol::getProtocolVersion(QString ip)
 {
+    DobotType::StructProtocolVersion structProtocolVersion;
     QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22002"+"/protocol/version");
     qDebug()<<"DobotProtocol::getProtocolVersion-->  "<<getReply;
     if(getReply.isEmpty())
     {
-        return "";
+        return structProtocolVersion;
     }
 
     QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
     QJsonObject jsonObject = jsonDoc.object();
-    return jsonObject.value("toolVersion").toString();
+    structProtocolVersion.toolVersion = jsonObject.value("toolVersion").toString();
+
+    structProtocolVersion.pathInfo.slave = jsonObject.value("pathInfo").toObject().value("slave").toString();
+    structProtocolVersion.pathInfo.control = jsonObject.value("pathInfo").toObject().value("control").toString();
+    structProtocolVersion.pathInfo.kernel = jsonObject.value("pathInfo").toObject().value("kernel").toString();
+    structProtocolVersion.pathInfo.v4restoreBackup = jsonObject.value("pathInfo").toObject().value("v4restoreBackup").toString();
+    return structProtocolVersion;
 }
 
 
+DobotType::SettingsProductInfoHardwareInfo DobotProtocol::getSettingsProductInfoHardwareInfo(QString ip)
+{
+    DobotType::SettingsProductInfoHardwareInfo productInfoHardwareInfo;
+    QByteArray getReply = m_httpManager->httpManagerGet("http://"+ip+":22000"+"/settings/productInfo/hardwareInfo");
+    qDebug()<<"DobotProtocol::getSettingsProductInfoHardwareInfo-->  "<<getReply;
+    if(getReply.isEmpty())
+    {
+        return productInfoHardwareInfo;
+    }
 
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
+    QJsonObject jsonObject = jsonDoc.object();
+    productInfoHardwareInfo.ControllCabinetSNCode = jsonObject.value("ControllCabinetSNCode").toString();
+    productInfoHardwareInfo.RobotArmSNCode = jsonObject.value("RobotArmSNCode").toString();
+    productInfoHardwareInfo.RealArmSNCode = jsonObject.value("RealArmSNCode").toString();
+
+    return productInfoHardwareInfo;
+}
+
+
+QString DobotProtocol::getSettingsProductInfoControllerSn(const QString &strIP, int iTimeoutMilliseconds)
+{
+    QString strUrl = QString("http://%1:22000/settings/productInfo/controllerSn").arg(strIP);
+    QByteArray getReply = m_httpManager->httpManagerGet(strUrl,iTimeoutMilliseconds);
+    qDebug()<<"DobotProtocol::getSettingsProductInfoControllerSn-->  "<<getReply;
+    if (getReply.isEmpty())
+    {
+        return QString();
+    }
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(getReply);
+    QJsonObject jsonObject = jsonDoc.object();
+    return jsonObject.value("SNcode").toString();
+}
 
 void DobotProtocol::sleep(int milliseconds)
 {
@@ -686,3 +966,49 @@ void DobotProtocol::sleep(int milliseconds)
         QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
 }
 
+bool DobotProtocol::postSettingsProductInfoControllerSn(const QString &strIP,const ControllerSnData& controlSNData, int iTimeoutMilliseconds)
+{
+    QString strUrl = QString("http://%1:22000/settings/productInfo/controllerSn").arg(strIP);
+    QByteArray postReply = m_httpManager->httpManagerPost(strUrl,controlSNData.toJsonString(),iTimeoutMilliseconds);
+    qDebug()<<"postReply  postSettingsProductInfoControllerSn " <<postReply;
+    if(postReply.isEmpty())
+    {
+        return false;
+    }
+    return QJsonDocument::fromJson(postReply).object().value("status").toBool();
+}
+bool DobotProtocol::postV3SettingsProductInfoControllerSn(const QString &strIP, const V3ControllerSnData &controlSNData, int iTimeoutMilliseconds)
+{
+    QString strUrl = QString("http://%1:22000/settings/productInfo/controllerSn").arg(strIP);
+    QByteArray postReply = m_httpManager->httpManagerPost(strUrl, controlSNData.toJsonString(),iTimeoutMilliseconds);
+    qDebug()<<"postReply  postV3SettingsProductInfoControllerSn " <<postReply;
+    if (postReply.isEmpty())
+    {
+        return false;
+    }
+    return QJsonDocument::fromJson(postReply).object().value("status").toBool();
+}
+
+bool DobotProtocol::postSettingsProductInfoRobotArmSn(const QString &strIP,const RobotArmSnData& robotArmSNData, int iTimeoutMilliseconds)
+{
+    QString strUrl = QString("http://%1:22000/settings/productInfo/robotArmSn").arg(strIP);
+    QByteArray postReply = m_httpManager->httpManagerPost(strUrl, robotArmSNData.toJsonString(),iTimeoutMilliseconds);
+    qDebug()<<"postReply  postSettingsProductInfoRobotArmSn " <<postReply;
+    if (postReply.isEmpty())
+    {
+        return false;
+    }
+    return QJsonDocument::fromJson(postReply).object().value("status").toBool();
+}
+
+bool DobotProtocol::postInterfaceClearAlarms(const QString &strIP, int iTimeoutMilliseconds)
+{
+    QString strUrl = QString("http://%1:22000/interface/clearAlarms").arg(strIP);
+    QByteArray postReply = m_httpManager->httpManagerPost(strUrl, QString(),iTimeoutMilliseconds);
+    qDebug()<<"postReply  postInterfaceClearAlarms " <<postReply;
+    if (postReply.isEmpty())
+    {
+        return false;
+    }
+    return QJsonDocument::fromJson(postReply).object().value("status").toBool();
+}

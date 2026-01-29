@@ -12,7 +12,7 @@
 #include <QLinkedList>
 #include <thread>
 
-/*
+
 #define LOG_TRACE(logAPI) CDebugLogger(__FILE__,__LINE__,__FUNCTION__).logAPI() \
                           .setDebug(CLogger::getInstance()->isLogOnFile()||CLogger::getInstance()->isLogEmitted())
 
@@ -20,7 +20,7 @@
 #define LOG_INFO() LOG_TRACE(info)
 #define LOG_WARN() LOG_TRACE(warning)
 #define LOG_ERROR() LOG_TRACE(critical)
-*/
+
 
 #ifdef qDebug
 #undef qDebug

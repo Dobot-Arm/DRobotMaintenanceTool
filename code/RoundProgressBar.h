@@ -51,6 +51,8 @@ public:
     void setInnerBarWidth(float);
     //设置范围
     void setRange(float, float);
+    float getMin()const{return _min;}
+    float getMax()const{return _max;}
     //设置当前值
     void setValue(float);
     //设置外圈颜色

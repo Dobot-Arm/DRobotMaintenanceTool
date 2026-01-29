@@ -1,18 +1,20 @@
 #include "WidgetSystemFileCheckTip.h"
 #include "ui_WidgetSystemFileCheckTip.h"
+#include <QTextDocument>
+#include <QAbstractTextDocumentLayout>
 
 WidgetSystemFileCheckTip::WidgetSystemFileCheckTip(QWidget *parent) :
-    QWidget(parent),
+    UIBaseWidget(parent),
     ui(new Ui::WidgetSystemFileCheckTip)
 {
     ui->setupUi(this);
-    QWidget::setAttribute(Qt::WA_QuitOnClose,false);
-//    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint );//无边框，置顶
+    QWidget::setAttribute(Qt::WA_DeleteOnClose,true);
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint |Qt::WindowSystemMenuHint);   //设置无边框,置顶
-    setWindowModality(Qt::ApplicationModal);
-    connect(ui->btnConfirm,&QPushButton::clicked,this,[&]{
-        close();
-    });
+    setWindowModality(Qt::ApplicationModal);      //禁用主窗口
+    setStyleSheet("background-color: rgba(0, 0, 0, 100);");
+    connect(ui->btnOk,&QPushButton::clicked,this,&WidgetSystemFileCheckTip::close);
+    connect(ui->btnCancel,&QPushButton::clicked,this,&WidgetSystemFileCheckTip::close);
+    connect(ui->btnFail,&QPushButton::clicked,this,&WidgetSystemFileCheckTip::close);
 }
 
 WidgetSystemFileCheckTip::~WidgetSystemFileCheckTip()
@@ -20,108 +22,66 @@ WidgetSystemFileCheckTip::~WidgetSystemFileCheckTip()
     delete ui;
 }
 
-void WidgetSystemFileCheckTip::setMessage(int status,QString errorfiles)
+void WidgetSystemFileCheckTip::setMessage(int status,QStringList errorfiles)
 {
-    ui->btnConfirm->hide();
-
-    ui->textErrorFiles->hide();
-    ui->textErrorFiles->clear();
-    ui->labelFailed->hide();
-    ui->labelFailedIcon->hide();
-    ui->labelHelp->hide();
-
-    ui->labelVersionFail->hide();
-    ui->labelVersionFailIcon->hide();
-
-    ui->labelRepairing->hide();
-
-    ui->labelSuccess->hide();
-    ui->labelSuccessIcon->hide();
+    ui->widgetProgress->hide();
+    ui->widgetOk->hide();
+    ui->widgetFail->hide();
+    ui->widgetFailMsg->hide();
     if(status == SystemFileCheckTipStatus::FileCheck_INIT)
     {
-
     }
-    if(status == SystemFileCheckTipStatus::FileCheck_DOING)
+    else if(status == SystemFileCheckTipStatus::FileCheck_DOING)
     {
-        ui->labelRepairing->show();
+        ui->widgetProgress->show();
     }
-    if(status == SystemFileCheckTipStatus::FileCheck_SUCCESS)
+    else if(status == SystemFileCheckTipStatus::FileCheck_SUCCESS)
     {
-        ui->labelSuccess->show();
-        ui->labelSuccessIcon->show();
-        ui->btnConfirm->show();
+        ui->widgetOk->show();
     }
-    if(status == SystemFileCheckTipStatus::FileCheck_FAIL)
+    else if(status == SystemFileCheckTipStatus::FileCheck_VEVRSION_FAIL)
     {
-        ui->textErrorFiles->setText(errorfiles);
-        ui->textErrorFiles->show();
-        ui->labelFailed->show();
-        ui->labelFailedIcon->show();
-        ui->labelHelp->show();
-        ui->btnConfirm->show();
+        ui->widgetFail->show();
     }
-
-    if(status == SystemFileCheckTipStatus::FileCheck_VEVRSION_FAIL)
+    else if(status == SystemFileCheckTipStatus::FileCheck_FAIL)
     {
-        ui->labelVersionFail->show();
-        ui->labelVersionFailIcon->show();
-        ui->btnConfirm->show();
+        ui->widgetFailMsg->show();
+
+        int iMargin = 56;
+        int iWidth = ui->widgetFailMsg->width();
+        int iHeight = 40;
+
+        int itxtwidth = iWidth-iMargin*2;
+        QFontMetrics info(ui->labelErrorTitle->font());
+        QSize sz = info.size(Qt::TextSingleLine,ui->labelErrorTitle->text());
+        if (sz.width()>itxtwidth){
+            int h = ((sz.width()+(itxtwidth-1))/itxtwidth)*sz.height();
+            ui->labelErrorTitle->setFixedSize(itxtwidth, h+20);
+        }else{
+            ui->labelErrorTitle->setFixedSize(itxtwidth,sz.height()+20);
+        }
+        iHeight += ui->labelErrorTitle->height();
+        iHeight += ui->btnCancel->height();
+        iHeight += 56;
+
+        QString strErrMsg;
+        for (int i=0; i<errorfiles.size(); ++i){
+            strErrMsg += errorfiles[i];
+            strErrMsg += '\n';
+        }
+        ui->txtErrMsg->setText(strErrMsg);
+        info = QFontMetrics(ui->txtErrMsg->font());
+        sz = info.size(Qt::TextSingleLine,"ABC");
+        int iTxtHeight = (errorfiles.size()+1)*sz.height();
+        if (iTxtHeight>300){
+            ui->txtErrMsg->setFixedHeight(300);
+        }else if (iTxtHeight<100){
+            ui->txtErrMsg->setFixedHeight(100);
+        }else{
+            ui->txtErrMsg->setFixedHeight(iTxtHeight+10);
+        }
+        iHeight += ui->txtErrMsg->height();
+        iHeight += 40;
+        ui->widgetFailMsg->setFixedHeight(iHeight);
     }
-}
-
-void WidgetSystemFileCheckTip::mousePressEvent(QMouseEvent *e)
-{
-    if(e->button()==Qt::LeftButton
-      && e->x() < this->width()
-      && e->y() < this->height())
-    {
-        this->setCursor(Qt::ClosedHandCursor);
-        mouse_press = true;
-    }
-    move_point=e->globalPos()-this->pos();
-}
-
-void WidgetSystemFileCheckTip::mouseMoveEvent(QMouseEvent *e)
-{
-    if(mouse_press)
-    {
-        QPoint move_pos=e->globalPos();
-        this->move(move_pos-move_point);
-    }
-}
-
-void WidgetSystemFileCheckTip::mouseReleaseEvent(QMouseEvent *e)
-{
-    mouse_press = false;
-    this->setCursor(Qt::ArrowCursor);
-}
-void WidgetSystemFileCheckTip::paintEvent(QPaintEvent *event)
-{
-    QPainterPath path;
-    path.setFillRule(Qt::WindingFill);
-    path.addRoundedRect(5, 5, this->width() - 5 * 2, this->height() - 5 * 2, 3, 3);
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.fillPath(path, QBrush(Qt::white));
-
-    QColor color(Qt::gray);
-    for (int i = 0; i < 5; i++)
-    {
-        QPainterPath path;
-        path.setFillRule(Qt::WindingFill);
-        path.addRoundedRect(5 - i, 5 - i, this->width() - (5 - i) * 2, this->height() - (5 - i) * 2, 3 + i, 3 + i);
-        color.setAlpha(80 - qSqrt(i) * 40);
-        painter.setPen(color);
-        painter.drawPath(path);
-    }
-
-}
-
-bool WidgetSystemFileCheckTip::event(QEvent *event)
-{
-    if(event->type() == QEvent::LanguageChange){
-        ui->retranslateUi(this);
-        return true;
-    }
-    return QWidget::event(event);
 }

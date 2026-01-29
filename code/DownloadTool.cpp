@@ -35,6 +35,31 @@ void DownloadTool::startDownload(const QString& downloadUrl, QString savePath)
     startRequest(newUrl);
 }
 
+void DownloadTool::startDownloadFile(const QString& downloadUrl,QString strSaveFile)
+{
+    const QUrl newUrl = QUrl::fromUserInput(QUrl::fromPercentEncoding(downloadUrl.toUtf8()));
+
+    if (!newUrl.isValid()) {
+#ifdef DOWNLOAD_DEBUG
+        qDebug() << QString("Invalid URL: %1: %2").arg(downloadUrl, newUrl.errorString());
+#endif // DOWNLOAD_DEBUG
+        return;
+    }
+
+    QFileInfo fi(strSaveFile);
+    QString savePath = fi.absolutePath();
+    if (!QFileInfo(savePath).isDir()) {
+        QDir dir;
+        dir.mkpath(savePath);
+    }
+
+    if (QFile::exists(strSaveFile)) { QFile::remove(strSaveFile); }
+    file = openFileForWrite(strSaveFile);
+    if (!file) return;
+
+    startRequest(newUrl);
+}
+
 void DownloadTool::cancelDownload()
 {
     httpRequestAborted = true;
@@ -84,7 +109,12 @@ void DownloadTool::httpFinished()
 
 void DownloadTool::httpReadyRead()
 {
-    if (file) {file->write(reply->readAll());}else{qDebug()<<"fail (((((((((((((";};
+    if (file) {
+        file->write(reply->readAll());
+    }
+    else{
+        qDebug()<<"fail (((((((((((((";
+    }
 }
 
 void DownloadTool::networkReplyProgress(qint64 bytesRead, qint64 totalBytes)

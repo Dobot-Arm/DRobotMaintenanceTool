@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FormMenuButton</class>
+ <widget class="QWidget" name="FormMenuButton">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>287</width>
+    <height>57</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QLabel" name="menuLeftIcon">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">.QLabel#menuLeftIcon{
+	border-image: url(:/image/images/icon_undownload.png);
+}
+.QLabel#menuLeftIcon[download=&quot;ok&quot;]{
+	border-image: url(:/image/images/icon_downloaded.png);
+}</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="menuText">
+     <property name="styleSheet">
+      <string notr="true">color: #A6AEBA;
+font-size: 14px;
+font-weight: 350;
+background-color: rgb(255, 255, 255);</string>
+     </property>
+     <property name="text">
+      <string>请选择将要升级的版本</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="menuRightIcon">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16</width>
+       <height>16</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">.QLabel#menuRightIcon{
+	border-image: url(:/image/images/icon_pull.png);
+}
+.QLabel#menuRightIcon[drop-down=&quot;on&quot;]{
+	border-image: url(:/image/images/takeback.png);
+}</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

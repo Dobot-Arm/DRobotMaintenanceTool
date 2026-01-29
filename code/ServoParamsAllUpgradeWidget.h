@@ -6,11 +6,12 @@
 #include <QPainter>
 #include <QtMath>
 #include "Define.h"
+#include "baseUI/UIBaseWidget.h"
 namespace Ui {
 class ServoParamsAllUpgradeWidget;
 }
 
-class ServoParamsAllUpgradeWidget : public QWidget
+class ServoParamsAllUpgradeWidget : public UIBaseWidget
 {
     Q_OBJECT
 
@@ -18,15 +19,13 @@ public:
     explicit ServoParamsAllUpgradeWidget(QWidget *parent = nullptr);
     ~ServoParamsAllUpgradeWidget();
     void setStatus(int status,QString msg = QString(),QString errorParams = QString());
-    void initStatus();
-public slots:
-    void slot_close();
 
-protected:
-    bool event(QEvent *event);
-    void paintEvent(QPaintEvent *event);
+public slots:
+    void show();
+
 private:
     Ui::ServoParamsAllUpgradeWidget *ui;
+    void initStatus();
 };
 
 #endif // SERVOPARAMSALLUPGRADEWIDGET_H

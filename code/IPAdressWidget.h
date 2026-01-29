@@ -4,12 +4,12 @@
 #include <QWidget>
 #include <QTime>
 
-#include "baseUI/BaseWidget.h"
+#include "baseUI/UIBaseWidget.h"
 namespace Ui {
 class IPAdressWidget;
 }
 
-class IPAdressWidget : public BaseWidget
+class IPAdressWidget : public UIBaseWidget
 {
     Q_OBJECT
 
@@ -19,11 +19,12 @@ public:
     void setSerial(QString serial);
     QStringList getIPAddress();
     void setIPAddress(QStringList ip);
-    bool isSave;
-public slots:
-    void slot_delIP();
+
 signals:
     void signal_deleteThisWidget(QWidget* w);
+
+private slots:
+    void slot_delIP();
 private:
     Ui::IPAdressWidget *ui;
 };

@@ -2,16 +2,14 @@
 #define MESSAGEWIDGET_H
 
 #include <QWidget>
-#include <QStyleOption>
-#include <QMouseEvent>
-#include <QPoint>
-#include <QPaintEvent>
-#include <QPainter>
+#include "baseUI/UIBaseWidget.h"
+#include <QResizeEvent>
+
 namespace Ui {
 class MessageWidget;
 }
 
-class MessageWidget : public QWidget
+class MessageWidget : public UIBaseWidget
 {
     Q_OBJECT
 
@@ -19,22 +17,14 @@ public:
     explicit MessageWidget(QWidget *parent = nullptr);
     ~MessageWidget();
     void setMessage(QString type,QString message);
-    bool event(QEvent *event);
-public slots:
-    void slot_closeWidget();
-    void slot_confirmWidget();
+    void setBtnText(QString txt);
+    void show();
+
+private:
+    bool event(QEvent *event) override;
+
 private:
     Ui::MessageWidget *ui;
-    QPoint move_point;
-    bool mouse_press;
-protected:
-//    //鼠标按下
-//    void mousePressEvent(QMouseEvent *e);
-//    //鼠标移动
-//    void mouseMoveEvent(QMouseEvent *e);
-//    //鼠标释放
-//    void mouseReleaseEvent(QMouseEvent *e);
-    void paintEvent(QPaintEvent *event);
 };
 
 #endif // MESSAGEWIDGET_H

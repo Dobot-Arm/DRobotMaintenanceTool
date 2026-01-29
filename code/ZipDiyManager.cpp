@@ -1,4 +1,8 @@
 ﻿#include "ZipDiyManager.h"
+#include <memory>
+#include <QProcess>
+#include <QApplication>
+#include <QEventLoop>
 TCHAR *CharToWchar(const QString &str);
 QString WcharToChar(const TCHAR *wp, size_t codePage);
 struct ZipFileInfo{
@@ -8,7 +12,7 @@ struct ZipFileInfo{
     bool isDir;
 };
 
-ZipDiyManager::ZipDiyManager()
+ZipDiyManager::ZipDiyManager():QObject(nullptr)
 {
 
 }
@@ -73,34 +77,33 @@ bool ZipDiyManager::zipUnCompress(QString strSrcZip, QString strDstPath,QString 
         return false;
     }
 
-    HZIP hz = OpenZip(CharToWchar(strSrcZip),password.toStdString().c_str());
-    ZIPENTRY ze; GetZipItem(hz,-1,&ze); int numitems=ze.index;
-    qDebug()<<"numitems  "<<numitems;
-    for (int i=0; i<numitems; i++)
+    QString strPwd(password);
+    QString strFile(strSrcZip);
+    QString strSavePath(strDstPath);
+    QEventLoop loop;
+    QProcess p;
+    p.setArguments(QStringList()<<"x"
+                    <<strFile<<QString("-o%1").arg(strSavePath)
+                   <<QString("-p%1").arg(strPwd)
+                   <<"-y");
+    p.setProgram(QCoreApplication::applicationDirPath()+"/tool/7-Zip/7z.exe");
+    connect(&p, &QProcess::errorOccurred, this, [&](QProcess::ProcessError error){
+        qDebug().noquote()<<"zipuncompress fail:"<<p.errorString();
+        loop.quit();
+    });
+    connect(&p, QOverload<int,QProcess::ExitStatus>::of(&QProcess::finished), this, [&](int exitCode, QProcess::ExitStatus exitStatus){
+        qDebug().noquote()<<"zipuncompress finished:"<<exitStatus;
+        loop.quit();
+    });
+    p.start();
+    loop.exec();
+    QString strInfo = p.readAll();
+    qDebug().noquote()<<"strInfo-------------------> "<<strInfo;
+    if (strInfo.contains("Everything is Ok"))
     {
-        GetZipItem(hz,i,&ze);
-        QString str = WcharToChar(ze.name,CP_UTF8);
-        str.prepend(strDstPath);
-        qDebug()<<"WcharToChar(CharToWchar  "<<WcharToChar(CharToWchar(str),CP_UTF8);
-        long unZipResult = UnzipItem(hz,i,CharToWchar(str));
-        qDebug()<<unZipResult;
-        int endItem = i;
-        if(unZipResult == ZR_PASSWORD){
-            qDebug()<<"解压密码错误";
-            for(int j = 0; j <= endItem;j++){
-                GetZipItem(hz,j,&ze);
-                QString strRemoveDir = WcharToChar(ze.name,CP_UTF8);
-                strRemoveDir = strRemoveDir.mid(0,strRemoveDir.indexOf('/'));
-                strRemoveDir.prepend(strDstPath);
-                QDir dir(strRemoveDir);
-                dir.removeRecursively();
-            }
-            CloseZip(hz);
-            return false;
-        }
+        return true;
     }
-    CloseZip(hz);
-    return true;
+    return false;
 }
 
 bool ZipDiyManager::zipCompressFilterDir(QString strSrcDir, QString strDstZip, QString password, QStringList filteredDirList,QString strSelectedDir)

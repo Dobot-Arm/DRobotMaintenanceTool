@@ -13,26 +13,55 @@
 #include "RoundProgressBar.h"
 #include "BubbleTipsWidget.h"
 #include "CommonData.h"
+#include "baseUI/UIBaseWidget.h"
 
 namespace Ui {
 class Upgrade2Widget;
 }
 
-class Upgrade2Widget : public QWidget
+class Upgrade2Widget : public UIBaseWidget
 {
     Q_OBJECT
 
 public:
     explicit Upgrade2Widget(QWidget *parent = nullptr);
     ~Upgrade2Widget();
+
+    void setErrorCode(int errorCode);
     void initStatus();
-    void setDiskCheckStatus(int ok,QString text = QString());
+    void setUpgradeStatus(QList<int> intUpgradeStatusList, bool bIsOutage);
+    void setDownloadFirmwareStatus(int ok,QString text = QString());
     void setDiskUpdateStatus(int ok,QString text = QString());
     void hideLabelUpdateDisk();
-    void setDownloadFirmwareStatus(int ok,QString text = QString());
+    void setDiskCheckStatus(int ok,QString text = QString());
+
+    int getIdxFWUniIO() const;
+    int getIdxFWMainCtrl() const;
+    int getIdxFWFeedback() const;;
+    int getIdxFWSafeIOB() const;
+    int getIdxFWSafeIO() const;;
+    int getIdxFWJ1() const;
+    int getIdxFWJ2() const;
+    int getIdxFWJ3() const;
+    int getIdxFWJ4() const;
+    int getIdxFWJ5() const;
+    int getIdxFWJ6() const;
+    int getIdxFWTerminal() const;
+
+    int getIdxXMLUniIO() const;
+    int getIdxXMLSafeIO() const;
+    int getIdxXMLJ1() const;
+    int getIdxXMLJ2() const;
+    int getIdxXMLJ3() const;
+    int getIdxXMLJ4() const;
+    int getIdxXMLJ5() const;
+    int getIdxXMLJ6() const;
+    int getIdxXMLTerminal() const;
+private:
+    void setCabinetType();
     int setFeedbackStatus(int ok,QString text = QString());
     int setIOFirmwareStatus(int ok,QString text = QString());
-    void setMainControlStatus(int ok,QString text = QString());
+    int setMainControlStatus(int ok,QString text = QString());
     int setSafeIOStatus(int ok,QString text = QString());
     int handleServoStatus(QList<int> upgradeStatusList);
     int setServoStatus(int ok,QString text = QString());
@@ -40,22 +69,9 @@ public:
     int setUnIOStatus(int ok,QString text = QString());
     void setIconStatus(QLabel* iconLabel,int ok);
     void setLabelWarningText(QString text);
-    void setCabinetType();
     void setRoundBarStatus(int status);
-    void setUpgradeStatus(QList<int> intUpgradeStatusList);
-    int m_posDiyX;
-    int m_posDiyY;
-    QList<int> m_intUpgradeStatusList;
-    QString m_currentControlVersion;
-    bool m_bIsOutage = false;
-    int m_singleUpgradeSlaveId = -1;
-    void initSingleUpgradeSlaveId(int slaveId);
-    bool isCanSingleUpgradeSlave(int slaveId);
-//    int m_terminalIOSingleCount;
-//    int m_servoSingleCount;
-//    int m_safeIOSingleCount;
-//    int m_uniIOSingleCount;
-//    int m_CCBOXSingleCount;
+    void initSingleUpgradeIdx(int idx);
+    bool isCanSingleUpgradeIdx(int idx);
 
 private:
     Ui::Upgrade2Widget *ui;
@@ -66,12 +82,28 @@ private:
     bool m_isUprgadeSuccess;
     void sleep(int milliseconds);
     RoundProgressBar* m_roundProgressBar;
-public slots:
-    void slot_closeWidget();
+    int m_errorCode;
+
+    int m_posDiyX;
+    int m_posDiyY;
+    QList<int> m_intUpgradeStatusList;
+    QString m_currentControlVersion;
+    QHash<int, //slaveid
+        int //次数
+    > m_checkUpdateFailTimes; //连续检测升级失败的次数
+    int m_retryUpdateTimes = 0; //重试升级的次数
+
+    QHash<QString,int> m_hashFW; //fw的索引值
+    QHash<QString,int> m_hashXML; //xml的索引值
+
 signals:
     void signal_interruptUpgradeUpgrade2Widget(bool isInterrupt);
     void signal_upgrade2WidgetFinishUpgrade(int status);
-    void singal_upgradeSingle2Count(int seqId,int status = 0);
+    void singal_upgradeSingle2Count();
+    void signal_ExportLogWhenError(int iType);
+protected slots:
+    void slot_closeWidget();
+    void onExportLog();
 protected:
 //    //鼠标按下
 //    void mousePressEvent(QMouseEvent *e);

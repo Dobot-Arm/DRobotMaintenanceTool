@@ -34,6 +34,8 @@
 #include <QSharedPointer>
 
 QT_BEGIN_NAMESPACE
+class QIODevice;
+class QBuffer;
 class QFile;
 QT_END_NAMESPACE
 
@@ -175,13 +177,13 @@ struct QSSH_EXPORT AbstractSftpTransfer : public AbstractSftpOperationWithHandle
     typedef QSharedPointer<AbstractSftpTransfer> Ptr;
 
     AbstractSftpTransfer(SftpJobId jobId, const QString &remotePath,
-        const QSharedPointer<QFile> &localFile);
+        const QSharedPointer<QIODevice> &localFile);
     ~AbstractSftpTransfer();
     void calculateInFlightCount(quint32 chunkSize);
 
     static const int MaxInFlightCount;
 
-    const QSharedPointer<QFile> localFile;
+    const QSharedPointer<QIODevice> localFile;
     quint64 fileSize;
     quint64 offset;
     int inFlightCount;
@@ -192,7 +194,7 @@ struct QSSH_EXPORT SftpDownload : public AbstractSftpTransfer
 {
     typedef QSharedPointer<SftpDownload> Ptr;
     SftpDownload(SftpJobId jobId, const QString &remotePath,
-        const QSharedPointer<QFile> &localFile);
+        const QSharedPointer<QIODevice> &localFile);
     virtual Type type() const { return Download; }
     virtual SftpOutgoingPacket &initialPacket(SftpOutgoingPacket &packet);
 
@@ -205,7 +207,7 @@ struct QSSH_EXPORT SftpUploadFile : public AbstractSftpTransfer
     typedef QSharedPointer<SftpUploadFile> Ptr;
 
     SftpUploadFile(SftpJobId jobId, const QString &remotePath,
-        const QSharedPointer<QFile> &localFile, SftpOverwriteMode mode,
+        const QSharedPointer<QIODevice> &localFile, SftpOverwriteMode mode,
         const QSharedPointer<SftpUploadDir> &parentJob = QSharedPointer<SftpUploadDir>());
     virtual Type type() const { return UploadFile; }
     virtual SftpOutgoingPacket &initialPacket(SftpOutgoingPacket &packet);

@@ -105,6 +105,7 @@ void CSFtpClient::onChannelInitialized()
     SFtpOptFile opt = m_ftpFileOperate.takeFirst();
     guard.unlock();
 
+    m_fileInfoList.clear();
     QSsh::SftpJobId job;
     if (SFtpOption::OPT_DOWNLOAD == opt.opt)
     {
@@ -140,7 +141,7 @@ void CSFtpClient::onChannelInitialized()
     {
         m_bIsBusy = false;
         //LOG_DEBUG()<<"Starting job fail,jobId="<<job<<",file id="<<opt.id;
-        emit signalFinishedJob(opt.id, false, QString("starting job error"));
+        emit signalFinishedJob(opt.id, m_fileInfoList, false, QString("starting job error"));
     }
 }
 
@@ -160,7 +161,7 @@ void CSFtpClient::onChannelFinished(QSsh::SftpJobId job, const QString &err)
 
     qint64 id = m_cacheJobId.value(job,0);
     m_cacheJobId.remove(job);
-    emit signalFinishedJob(id, err.isEmpty(), err);
+    emit signalFinishedJob(id, m_fileInfoList, err.isEmpty(), err);
 
     m_bIsBusy = false;
 }
@@ -175,6 +176,7 @@ void CSFtpClient::onChannelClosed()
 void CSFtpClient::slotOnChannelFileInfoAvailable(QSsh::SftpJobId job, const QList<QSsh::SftpFileInfo> &fileInfoList)
 {
     qint64 id = m_cacheJobId.value(job,0);
+    m_fileInfoList.append(fileInfoList);
     emit signalOnChannelFileInfoAvailableFinish(id, fileInfoList);
 }
 
@@ -182,7 +184,9 @@ void CSFtpClient::slotSSH()
 {
     if (!m_channel.isNull() && m_channel->state()==QSsh::SftpChannel::State::Initialized)
     {
+        m_pTimer->stop();
         onChannelInitialized();
+        m_pTimer->start();
     }
 }
 

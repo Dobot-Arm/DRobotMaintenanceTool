@@ -2,13 +2,12 @@
 #define ISCONTROLLOGBUSYWIDGET_H
 
 #include <QWidget>
-#include <QStyleOption>
-#include <QPainter>
+#include "baseUI/UIBaseWidget.h"
 namespace Ui {
 class IsControlLogBusyWidget;
 }
 
-class IsControlLogBusyWidget : public QWidget
+class IsControlLogBusyWidget : public UIBaseWidget
 {
     Q_OBJECT
 
@@ -16,6 +15,8 @@ public:
     explicit IsControlLogBusyWidget(QWidget *parent = nullptr);
     ~IsControlLogBusyWidget();
     bool event(QEvent *event);
+    void show();
+
 signals:
     void signal_isContinueUpgrade(bool isContinueUpgrade);
 public slots:
@@ -23,9 +24,6 @@ public slots:
     void slot_confirm();
 private:
     Ui::IsControlLogBusyWidget *ui;
-protected:
-    void paintEvent(QPaintEvent *event);
-
 };
 
 #endif // ISCONTROLLOGBUSYWIDGET_H

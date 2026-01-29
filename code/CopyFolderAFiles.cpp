@@ -85,30 +85,4 @@ bool CopyFolderAFiles::copyFolderHandle(const QString &fromDir, const QString &t
     }
     return true;
 
-//    QDir srcDir(fromDir);
-//    QDir dstDir(toDir);
-//    if (!dstDir.exists()) { //目的文件目录不存在则创建文件目录
-//       if (!dstDir.mkpath(dstDir.absolutePath()))
-//           return false;
-//    }
-//    QFileInfoList fileInfoList = srcDir.entryInfoList();
-//    foreach(QFileInfo fileInfo, fileInfoList) {
-//       if (fileInfo.fileName() == "." || fileInfo.fileName() == "..")
-//           continue;
-
-//       if (fileInfo.isDir()) {    // 当为目录时，递归的进行copy
-//           if (!copyFolderHandle(fileInfo.filePath(),dstDir.filePath(fileInfo.fileName()),coverFileIfExist))
-//               return false;
-//       }
-//       else {            //当允许覆盖操作时，将旧文件进行删除操作
-//           if (coverFileIfExist && dstDir.exists(fileInfo.fileName())) {
-//               dstDir.remove(fileInfo.fileName());
-//           }
-//           /// 进行文件copy
-//           if (!QFile::copy(fileInfo.filePath(), dstDir.filePath(fileInfo.fileName()))) {
-//               return false;
-//           }
-//       }
-//    }
-//     return true;
 }

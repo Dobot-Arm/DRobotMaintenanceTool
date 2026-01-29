@@ -6,27 +6,28 @@
 #include <QPainter>
 #include <QtMath>
 #include "Define.h"
+#include "baseUI/UIBaseWidget.h"
+
 namespace Ui {
 class Widget2ServoParamsWait;
 }
 
-class Widget2ServoParamsWait : public QWidget
+class Widget2ServoParamsWait : public UIBaseWidget
 {
     Q_OBJECT
 
 public:
     explicit Widget2ServoParamsWait(QWidget *parent = nullptr);
     ~Widget2ServoParamsWait();
-    void setStatus(int status,QString msg = QString(),QString errorParams = QString());
+    void setStatus(int status,QString msg = QString(),QStringList errorParams = QStringList());
+    void show();
+
+protected:
     void initStatus();
-public slots:
-    void slot_close();
+    void showEvent(QShowEvent *event) override;
 
 private:
     Ui::Widget2ServoParamsWait *ui;
-protected:
-    bool event(QEvent *event);
-    void paintEvent(QPaintEvent *event);
 };
 
 #endif // WIDGET2SERVOPARAMSWAIT_H

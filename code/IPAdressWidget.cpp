@@ -1,13 +1,29 @@
 ﻿#include "IPAdressWidget.h"
 #include "ui_IPAdressWidget.h"
+#include <QRegularExpressionValidator>
 
 IPAdressWidget::IPAdressWidget(QWidget *parent) :
-    BaseWidget(parent),
+    UIBaseWidget(parent),
     ui(new Ui::IPAdressWidget)
 {
     ui->setupUi(this);
-    isSave = false;
+    setStyleSheet("background: #FAFDFF;");
     connect(ui->btnDelIP,&QPushButton::clicked,this,&IPAdressWidget::slot_delIP);
+    ui->lineIP_1->setValidator(new QRegularExpressionValidator(QRegularExpression("[0-9]+")));
+    ui->lineIP_2->setValidator(new QRegularExpressionValidator(QRegularExpression("[0-9]+")));
+    ui->lineIP_3->setValidator(new QRegularExpressionValidator(QRegularExpression("[0-9]+")));
+    ui->lineIP_4->setValidator(new QRegularExpressionValidator(QRegularExpression("[0-9]+")));
+
+    connect(ui->lineIP_1, &QLineEdit::textChanged, this, [this](QString str){
+        if (str.length()>=3) ui->lineIP_2->setFocus();
+    });
+    connect(ui->lineIP_2, &QLineEdit::textChanged, this, [this](QString str){
+        if (str.length()>=3) ui->lineIP_3->setFocus();
+    });
+    connect(ui->lineIP_3, &QLineEdit::textChanged, this, [this](QString str){
+        if (str.length()>=3) ui->lineIP_4->setFocus();
+    });
+    ui->lineIP_1->setFocus();
 }
 
 IPAdressWidget::~IPAdressWidget()
@@ -43,7 +59,6 @@ void IPAdressWidget::setIPAddress(QStringList ip)
 void IPAdressWidget::slot_delIP()
 {
     emit signal_deleteThisWidget(this);
-
 }
 
 

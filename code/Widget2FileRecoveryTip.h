@@ -5,11 +5,12 @@
 #include <QPainter>
 #include <QtMath>
 #include <QMouseEvent>
+#include "baseUI/UIBaseWidget.h"
 namespace Ui {
 class Widget2FileRecoveryTip;
 }
 
-class Widget2FileRecoveryTip : public QWidget
+class Widget2FileRecoveryTip : public UIBaseWidget
 {
     Q_OBJECT
 
@@ -23,17 +24,6 @@ signals:
 
 private:
     Ui::Widget2FileRecoveryTip *ui;
-    QPoint move_point;
-    bool mouse_press;
-protected:
-    //鼠标按下
-    void mousePressEvent(QMouseEvent *e);
-    //鼠标移动
-    void mouseMoveEvent(QMouseEvent *e);
-    //鼠标释放
-    void mouseReleaseEvent(QMouseEvent *e);
-    void paintEvent(QPaintEvent *event);
-    bool event(QEvent *event);
 };
 
 #endif // WIDGET2FILERECOVERYTIP_H

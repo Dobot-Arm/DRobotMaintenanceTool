@@ -33,6 +33,7 @@
 
 #include <QDir>
 #include <QFile>
+#include <QBuffer>
 
 /*!
     \class QSsh::SftpChannel
@@ -192,6 +193,16 @@ SftpJobId SftpChannel::uploadFile(const QString &localFilePath,
         new Internal::SftpUploadFile(++d->m_nextJobId, remoteFilePath, localFile, mode)));
 }
 
+SftpJobId SftpChannel::uploadFile(const QSharedPointer<QBuffer>& localData,
+    const QString &remoteFilePath, SftpOverwriteMode mode)
+{
+    QSharedPointer<QIODevice> localFile(localData);
+    if (!localFile->open(QIODevice::ReadOnly))
+        return SftpInvalidJob;
+    return d->createJob(Internal::SftpUploadFile::Ptr(
+        new Internal::SftpUploadFile(++d->m_nextJobId, remoteFilePath, localFile, mode)));
+}
+
 SftpJobId SftpChannel::downloadFile(const QString &remoteFilePath,
     const QString &localFilePath, SftpOverwriteMode mode)
 {
@@ -207,6 +218,16 @@ SftpJobId SftpChannel::downloadFile(const QString &remoteFilePath,
         return SftpInvalidJob;
     return d->createJob(Internal::SftpDownload::Ptr(
         new Internal::SftpDownload(++d->m_nextJobId, remoteFilePath, localFile)));
+}
+
+SftpJobId SftpChannel::downloadFile(const QString &remoteFilePath,const QSharedPointer<QBuffer> &localData)
+{
+    QSharedPointer<QIODevice> localFile(localData);
+    QIODevice::OpenMode openMode = QIODevice::WriteOnly | QIODevice::Append;
+    if (!localFile->open(openMode))
+        return SftpInvalidJob;
+    return d->createJob(Internal::SftpDownload::Ptr(
+         new Internal::SftpDownload(++d->m_nextJobId, remoteFilePath, localFile)));
 }
 
 SftpJobId SftpChannel::uploadDir(const QString &localDirPath,
@@ -949,7 +970,11 @@ void SftpChannelPrivate::sendWriteRequest(const JobMap::Iterator &it)
 {
     SftpUploadFile::Ptr job = it.value().staticCast<SftpUploadFile>();
     QByteArray data = job->localFile->read(AbstractSftpPacket::MaxDataSize);
-    if (job->localFile->error() != QFile::NoError) {
+    QFile::FileError err = QFile::NoError;
+    if (0 == strcmp(QFile::staticMetaObject.className(),job->localFile->metaObject()->className())){
+        err = job->localFile.staticCast<QFile>()->error();
+    }
+    if (err != QFile::NoError) {
         if (job->parentJob)
             job->parentJob->setError();
         reportRequestError(job, tr("Error reading local file: %1")

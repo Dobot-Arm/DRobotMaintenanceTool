@@ -7,6 +7,8 @@
 #include <QDebug>
 #include "Define.h"
 #include <QMouseEvent>
+
+#include<QCheckBox>
 class MyCheckBoxHeader : public QHeaderView
 {
     Q_OBJECT
@@ -32,7 +34,7 @@ protected:
 
 private:
     bool isChecked_;
-
+    QCheckBox m_checkBox;
     void redrawCheckBox();
     int mBodyColumn;
     int mActualResultColumn;

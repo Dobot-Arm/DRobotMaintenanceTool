@@ -8,10 +8,12 @@
 #include <QDebug>
 #include <QDir>
 #include <windows.h>
-class ZipDiyManager
+class ZipDiyManager : public QObject
 {
+    Q_OBJECT
 public:
     ZipDiyManager();
+    virtual ~ZipDiyManager(){}
     bool zipDiyCompress(QString strSrcDir,QString strDstZip,QString password);
     bool zipUnCompress(QString strSrcZip, QString strDstPath,QString password);
     bool zipCompressFilterDir(QString strSrcDir,QString strDstZip,QString password,QStringList filteredDirList,QString strSelectedDir);

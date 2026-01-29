@@ -70,8 +70,12 @@ public:
     SftpJobId createLink(const QString &filePath, const QString &target);
     SftpJobId uploadFile(const QString &localFilePath,
         const QString &remoteFilePath, SftpOverwriteMode mode);
+    SftpJobId uploadFile(const QSharedPointer<QBuffer>& localData,
+        const QString &remoteFilePath, SftpOverwriteMode mode);
     SftpJobId downloadFile(const QString &remoteFilePath,
         const QString &localFilePath, SftpOverwriteMode mode);
+    SftpJobId downloadFile(const QString &remoteFilePath,
+        const QSharedPointer<QBuffer>& localData);
     SftpJobId uploadDir(const QString &localDirPath,
         const QString &remoteParentDirPath);
 

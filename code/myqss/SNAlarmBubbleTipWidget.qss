@@ -1,0 +1,19 @@
+.SNAlarmBubbleTipWidget
+{
+    border-radius: 3px;
+    border: 1px solid #CE4949;
+    background: #FFE0E0;
+}
+.QLabel#labelIcon
+{
+    image: url(:/image/images/small_error.png);
+}
+.QLabel#labelText
+{
+    color: rgba(0, 0, 0, 0.40);
+    font-family: PingFang SC;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal;
+}

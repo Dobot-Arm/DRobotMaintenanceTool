@@ -22,6 +22,12 @@
     <height>548</height>
    </size>
   </property>
+  <property name="maximumSize">
+   <size>
+    <width>550</width>
+    <height>700</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>

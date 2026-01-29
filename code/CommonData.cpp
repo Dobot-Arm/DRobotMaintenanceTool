@@ -1,4 +1,6 @@
 #include "CommonData.h"
+
+#include <QTime>
 namespace CommonData {
     static DobotType::SettingsVersion g_currentSettingVersion;
     void setCurrentSettingsVersion(const DobotType::SettingsVersion &settingsVersion)
@@ -22,12 +24,12 @@ namespace CommonData {
         return g_upgradeSettingVersion;
     }
 
-    QString g_strPropertiesCabinetType;
-    QString getStrPropertiesCabinetType()
+    DobotType::CabinetType g_strPropertiesCabinetType;
+    DobotType::CabinetType getStrPropertiesCabinetType()
     {
         return g_strPropertiesCabinetType;
     }
-    void setStrPropertiesCabinetType(QString propertiesCabinetType)
+    void setStrPropertiesCabinetType(DobotType::CabinetType propertiesCabinetType)
     {
         g_strPropertiesCabinetType = propertiesCabinetType;
     }
@@ -43,68 +45,69 @@ namespace CommonData {
         g_controllerType = controllerType;
     }
 
-    int g_upgradeCount = 0;
-    void setAllUpgradeToSingleUpgradeCount(int count)
+    DobotType::StructProtocolVersion g_structProtocolVersion;
+    void setStructProtocolVersion(DobotType::StructProtocolVersion structProtocolVersion)
     {
-        g_upgradeCount = count;
+        g_structProtocolVersion = structProtocolVersion;
     }
-    int getAllUpgradeToSingleUpgradeCount()
+
+    DobotType::StructProtocolVersion getStructProtocolVersion()
     {
-        return g_upgradeCount;
+        return g_structProtocolVersion;
     }
 
     int upgrade2WidgetSafeIOFOEStatus;
-    int getUpgrade2WidgetSafeIOFOEStatus()
+    int getSafeIOFOEStatus()
     {
         return upgrade2WidgetSafeIOFOEStatus;
     }
 
-    void setUpgrade2WidgetSafeIOFOEStatus(int status)
+    void setSafeIOFOEStatus(int status)
     {
         upgrade2WidgetSafeIOFOEStatus = status;
     }
 
     int uprgade2WidgetSafeIOXMLStatus;
-    int getUpgrade2WidgetSafeIOXMLStatus()
+    int getSafeIOXMLStatus()
     {
-        return upgrade2WidgetSafeIOFOEStatus;
+        return uprgade2WidgetSafeIOXMLStatus;
     }
 
-    void setUpgrade2WidgetSafeIOXMLStatus(int status)
+    void setSafeIOXMLStatus(int status)
     {
         uprgade2WidgetSafeIOXMLStatus = status;
     }
 
     int upgrade2WidgetFeedbackStatus;
-    int getUpgrade2WidgetFeedbackStatus()
+    int getFeedbackStatus()
     {
         return upgrade2WidgetFeedbackStatus;
     }
 
-    void setUpgrade2WidgetFeedbackStatus(int status)
+    void setFeedbackStatus(int status)
     {
         upgrade2WidgetFeedbackStatus = status;
     }
 
     int upgrade2WidgetUniIOFOEStatus;
-    int getUpgrade2WidgetUniIOFOEStatus()
+    int getUniIOFOEStatus()
     {
         return upgrade2WidgetUniIOFOEStatus;
     }
 
-    void setUpgrade2WidgetUniIOFOEStatus(int status)
+    void setUniIOFOEStatus(int status)
     {
         upgrade2WidgetUniIOFOEStatus = status;
     }
 
 
     int upgrade2WidgetUniIOXMLStatus;
-    int getUpgrade2WidgetUniIOXMLStatus()
+    int getUniIOXMLStatus()
     {
         return upgrade2WidgetUniIOXMLStatus;
     }
 
-    void setUpgrade2WidgetUniIOXMLStatus(int status)
+    void setUniIOXMLStatus(int status)
     {
         upgrade2WidgetUniIOXMLStatus = status;
     }
@@ -114,25 +117,25 @@ namespace CommonData {
 
 
     int upgrade2WidgetServoJ1XMLStatus;
-    int getUpgrade2WidgetServoJ1XMLStatus()
+    int getServoJ1XMLStatus()
     {
         return upgrade2WidgetServoJ1XMLStatus;
     }
 
 
-    void setUpgrade2WidgetServoJ1XMLStatus(int status)
+    void setServoJ1XMLStatus(int status)
     {
         upgrade2WidgetServoJ1XMLStatus = status;
     }
 
 
     int upgrade2WidgetServoJ1FOEStatus;
-    int getUpgrade2WidgetServoJ1FOEStatus()
+    int getServoJ1FOEStatus()
     {
         return upgrade2WidgetServoJ1FOEStatus;
     }
 
-    void setUpgrade2WidgetServoJ1FOEStatus(int status)
+    void setServoJ1FOEStatus(int status)
     {
         upgrade2WidgetServoJ1FOEStatus = status;
     }
@@ -143,25 +146,25 @@ namespace CommonData {
 
 
     int upgrade2WidgetServoJ2XMLStatus;
-    int getUpgrade2WidgetServoJ2XMLStatus()
+    int getServoJ2XMLStatus()
     {
         return upgrade2WidgetServoJ2XMLStatus;
     }
 
 
-    void setUpgrade2WidgetServoJ2XMLStatus(int status)
+    void setServoJ2XMLStatus(int status)
     {
         upgrade2WidgetServoJ2XMLStatus = status;
     }
 
 
     int upgrade2WidgetServoJ2FOEStatus;
-    int getUpgrade2WidgetServoJ2FOEStatus()
+    int getServoJ2FOEStatus()
     {
         return upgrade2WidgetServoJ2FOEStatus;
     }
 
-    void setUpgrade2WidgetServoJ2FOEStatus(int status)
+    void setServoJ2FOEStatus(int status)
     {
         upgrade2WidgetServoJ2FOEStatus = status;
     }
@@ -171,25 +174,25 @@ namespace CommonData {
 
 
     int upgrade2WidgetServoJ3XMLStatus;
-    int getUpgrade2WidgetServoJ3XMLStatus()
+    int getServoJ3XMLStatus()
     {
         return upgrade2WidgetServoJ3XMLStatus;
     }
 
 
-    void setUpgrade2WidgetServoJ3XMLStatus(int status)
+    void setServoJ3XMLStatus(int status)
     {
         upgrade2WidgetServoJ3XMLStatus = status;
     }
 
 
     int upgrade2WidgetServoJ3FOEStatus;
-    int getUpgrade2WidgetServoJ3FOEStatus()
+    int getServoJ3FOEStatus()
     {
         return upgrade2WidgetServoJ3FOEStatus;
     }
 
-    void setUpgrade2WidgetServoJ3FOEStatus(int status)
+    void setServoJ3FOEStatus(int status)
     {
         upgrade2WidgetServoJ3FOEStatus = status;
     }
@@ -199,25 +202,25 @@ namespace CommonData {
 
 
     int upgrade2WidgetServoJ4XMLStatus;
-    int getUpgrade2WidgetServoJ4XMLStatus()
+    int getServoJ4XMLStatus()
     {
         return upgrade2WidgetServoJ4XMLStatus;
     }
 
 
-    void setUpgrade2WidgetServoJ4XMLStatus(int status)
+    void setServoJ4XMLStatus(int status)
     {
         upgrade2WidgetServoJ4XMLStatus = status;
     }
 
 
     int upgrade2WidgetServoJ4FOEStatus;
-    int getUpgrade2WidgetServoJ4FOEStatus()
+    int getServoJ4FOEStatus()
     {
         return upgrade2WidgetServoJ4FOEStatus;
     }
 
-    void setUpgrade2WidgetServoJ4FOEStatus(int status)
+    void setServoJ4FOEStatus(int status)
     {
         upgrade2WidgetServoJ4FOEStatus = status;
     }
@@ -228,25 +231,25 @@ namespace CommonData {
 
 
     int upgrade2WidgetServoJ5XMLStatus;
-    int getUpgrade2WidgetServoJ5XMLStatus()
+    int getServoJ5XMLStatus()
     {
         return upgrade2WidgetServoJ5XMLStatus;
     }
 
 
-    void setUpgrade2WidgetServoJ5XMLStatus(int status)
+    void setServoJ5XMLStatus(int status)
     {
         upgrade2WidgetServoJ5XMLStatus = status;
     }
 
 
     int upgrade2WidgetServoJ5FOEStatus;
-    int getUpgrade2WidgetServoJ5FOEStatus()
+    int getServoJ5FOEStatus()
     {
         return upgrade2WidgetServoJ5FOEStatus;
     }
 
-    void setUpgrade2WidgetServoJ5FOEStatus(int status)
+    void setServoJ5FOEStatus(int status)
     {
         upgrade2WidgetServoJ5FOEStatus = status;
     }
@@ -254,25 +257,25 @@ namespace CommonData {
 
 
     int upgrade2WidgetServoJ6XMLStatus;
-    int getUpgrade2WidgetServoJ6XMLStatus()
+    int getServoJ6XMLStatus()
     {
         return upgrade2WidgetServoJ6XMLStatus;
     }
 
 
-    void setUpgrade2WidgetServoJ6XMLStatus(int status)
+    void setServoJ6XMLStatus(int status)
     {
         upgrade2WidgetServoJ6XMLStatus = status;
     }
 
 
     int upgrade2WidgetServoJ6FOEStatus;
-    int getUpgrade2WidgetServoJ6FOEStatus()
+    int getServoJ6FOEStatus()
     {
         return upgrade2WidgetServoJ6FOEStatus;
     }
 
-    void setUpgrade2WidgetServoJ6FOEStatus(int status)
+    void setServoJ6FOEStatus(int status)
     {
         upgrade2WidgetServoJ6FOEStatus = status;
     }
@@ -280,63 +283,109 @@ namespace CommonData {
 
 
     int uprgade2WidgetTerminalXMLStatus;
-    int getUpgrade2WidgetTerminalXMLStatus()
+    int getTerminalXMLStatus()
     {
         return uprgade2WidgetTerminalXMLStatus;
     }
 
-    void setUpgrade2WidgetTerminalXMLStatus(int status)
+    void setTerminalXMLStatus(int status)
     {
         uprgade2WidgetTerminalXMLStatus = status;
     }
 
     int upgrade2WidgetTerminalFOEStatus;
-    int getUpgrade2WidgetTerminalFOEStatus()
+    int getTerminalFOEStatus()
     {
         return upgrade2WidgetTerminalFOEStatus;
     }
 
-    void setUpgrade2WidgetTerminalFOEStatus(int status)
+    void setTerminalFOEStatus(int status)
     {
         upgrade2WidgetTerminalFOEStatus = status;
     }
 
     int upgrade2WidgetCCBOXFOE;
-    int getUpgrade2WidgetCCBOXFOEStatus()
+    int getCCBOXFOEStatus()
     {
         return upgrade2WidgetCCBOXFOE;
     }
 
-    void setUpgrade2WidgetCCBOXFOEStatus(int status)
+    void setCCBOXFOEStatus(int status)
     {
         upgrade2WidgetCCBOXFOE = status;
     }
 
+    int upgrade2MainConrtol;
+    void setMainControlStatus(int status)
+    {
+        upgrade2MainConrtol = status;
+    }
+
+    int getMainControlStatus()
+    {
+        return upgrade2MainConrtol;
+    }
+
     int upgrade2WidgetCCBOXXML;
-    int getUpgrade2WidgetCCBOXXMLStatus()
+    int getCCBOXXMLStatus()
     {
         return upgrade2WidgetCCBOXXML;
     }
 
-    void setUpgrade2WidgetCCBOXXMLStatus(int status)
+    void setCCBOXXMLStatus(int status)
     {
         upgrade2WidgetCCBOXXML = status;
     }
 
     int upgrade2WidgetSafeBFOEStatus;
-    int getUpgrade2WidgetSafeBFOEStatus()
+    int getSafeBFOEStatus()
     {
         return upgrade2WidgetSafeBFOEStatus;
     }
 
-    void setUpgrade2WidgetSafeBFOEStatus(int status)
+    void setSafeBFOEStatus(int status)
     {
         upgrade2WidgetSafeBFOEStatus = status;
     }
 
+    int getRandom()
+    {
+        int randTime =  QTime::currentTime().msec();
+        if(randTime<10)
+        {
+            return randTime*1000;
+        }
+        if(randTime<100)
+        {
+            return randTime*100;
+        }
+        if(randTime<1000)
+        {
+            return randTime*10;
+        }
+        return randTime;
+    }
 
+    DobotType::SettingsProductInfoHardwareInfo g_settingsProductInfoHardwareInfo;
+    DobotType::SettingsProductInfoHardwareInfo getSettingsProductInfoHardwareInfo()
+    {
+        return g_settingsProductInfoHardwareInfo;
+    }
 
+    void setSettingsProductInfoHardwareInfo(DobotType::SettingsProductInfoHardwareInfo settingsProductInfoHardwareInfo)
+    {
+        g_settingsProductInfoHardwareInfo = settingsProductInfoHardwareInfo;
+    }
 
+    QHash<int,DobotType::StructErrorCode> g_errorCodes;
+    void setErroCodes(QHash<int,DobotType::StructErrorCode> errorCodes)
+    {
+        g_errorCodes = errorCodes;
+    }
 
+    QHash<int,DobotType::StructErrorCode> getErrorCodes()
+    {
+        return g_errorCodes;
+    }
 
 }

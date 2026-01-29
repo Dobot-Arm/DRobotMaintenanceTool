@@ -17,8 +17,7 @@ public:
     explicit DowloadTipWidget(QWidget *parent = nullptr);
     ~DowloadTipWidget();
     void setMessage(QString msg);
-public slots:
-    void slot_confirm();
+
 private:
     Ui::DowloadTipWidget *ui;
 };

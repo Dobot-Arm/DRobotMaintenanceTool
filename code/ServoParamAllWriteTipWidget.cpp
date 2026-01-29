@@ -9,6 +9,7 @@ ServoParamAllWriteTipWidget::ServoParamAllWriteTipWidget(QWidget *parent) :
     QWidget::setAttribute(Qt::WA_QuitOnClose,false);
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint |Qt::WindowSystemMenuHint);   //设置无边框,置顶
     setWindowModality(Qt::ApplicationModal);      //禁用主窗口
+    setAttribute(Qt::WA_TranslucentBackground, true);//设置窗口背景透明
     connect(ui->btnConfirm,&QPushButton::clicked,this,[&]{
         emit signal_servoParamsAllWrite();
         close();
@@ -50,6 +51,16 @@ void ServoParamAllWriteTipWidget::setMessage(bool isNew, QString text)
     ui->labelMessage->setText(text);
 
 }
+
+bool ServoParamAllWriteTipWidget::event(QEvent *event)
+{
+    if(event->type() == QEvent::LanguageChange){
+        ui->retranslateUi(this);
+        return true;
+    }
+    return QWidget::event(event);
+}
+
 
 void ServoParamAllWriteTipWidget::initStatus()
 {

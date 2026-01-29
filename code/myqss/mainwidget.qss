@@ -2,14 +2,31 @@ QWidget#MainWidget2
 {
     color: #5E626E;
 }
+
+QComboBox#boxDevice { /* all types of tool button */
+  border:none;
+  color: rgba(255, 255, 255,200);
+  background-color: transparent;
+  font-size: 14px;
+}
+QComboBox#boxDevice::drop-down
+{
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    width: 30px;
+    border:none;
+}
+
+
 QWidget#WidgetSystemLogExport{
-        border-radius:6px;
-        background-color: #FAFDFF;
+    border-radius:6px;
+    background-color: #FAFDFF;
 }
 
 QToolButton#btnMenu { /* all types of tool button */
   border: 1.2px solid #C6C9D7;
   border-radius: 4px;
+  font-size: 14px;
 }
 
 QToolButton#btnMenu::menu-indicator{
@@ -38,6 +55,7 @@ QPushButton#btnManuallyAdd
     border:none;
     background-color: transparent;
     color: rgb(0,71,187);
+    font-size:12px;
 }
 QPushButton#btnManuallyAdd:disable
 {
@@ -85,6 +103,7 @@ QPushButton#btnConnect{ /* all types of tool button */
   border-radius: 4px;
   background-color: #30CF58;
   color: rgb(255, 255, 255);
+  font-size: 14px;
 }
 
 
@@ -109,6 +128,263 @@ QWidget#ServoParamAllWriteTipWidget>QPushButton#btnConfirm
     padding-left:24px;
     padding-right:24px;
 }
+
+QCheckBox{
+        spacing: 5px;
+        color: white;
+}
+QCheckBox::indicator {
+        width: 17px;
+        height: 17px;
+}
+QCheckBox::indicator:unchecked {
+        image: url(:/image/images2/icon_servoParamUncheck.png);
+}
+
+QCheckBox::indicator:checked {
+        image: url(:/image/images2/icon_servoParamChecked.png);
+}
+
+
+QWidget#AboutMeWidget{
+    border-radius:6px;
+    background-color: #FAFDFF;
+    color:#2D3440;
+}
+
+QWidget#AboutMeWidget>QPushButton#btnConfirm
+{
+    background-color: #0047BB;
+    color: rgb(255, 255, 255);
+    border-radius:6px;
+}
+
+QWidget#AboutMeWidget>QLabel#labelVersion
+{
+    border-radius:6px;
+    border:1px solid #DFE3E5;
+}
+
+
+
+QComboBox{
+    background-color: #FAFDFF;
+    font-size: 14px;
+    font-weight: 350;
+    color: rgba(45, 52, 64, 1);
+    border: 0.5px solid #DFE3E5;
+    border-radius: 4px;
+    padding-left:12px;
+}
+QComboBox QAbstractItemView
+{
+    background-color: #FAFDFF;
+    font-size: 14px;
+    font-weight: 350;
+    color: rgba(45, 52, 64, 1);
+    border: 0.5px solid #DFE3E5;
+    border-radius: 4px;
+    outline:0px;
+}
+QComboBox QAbstractItemView::item{
+    background-color: transparent;
+    height:40px;
+    padding-left:12px;
+}
+QComboBox QAbstractItemView::item:selected{
+    background-color: rgba(0, 71, 187, 0.1);
+    color: #0047BB;
+}
+QComboBox QAbstractItemView::item:hover{
+    background-color: rgba(0, 71, 187, 0.1);
+    color: #0047BB;
+}
+QComboBox::drop-down {
+    border:none;
+}
+
+QComboBox::down-arrow {
+    image: url(:/image/images2/icon_single_logExport_normal.png);
+    padding-right:8px;
+}
+
+QComboBox QAbstractScrollArea QScrollBar:vertical
+{
+    width: 10px;
+    background-color: #FFFFFF;
+}
+
+QComboBox QAbstractScrollArea QScrollBar::handle:vertical {
+    border-radius: 5px;
+    background: rgb(220,220,220);
+}
+
+QComboBox QAbstractScrollArea QScrollBar::handle:vertical:hover {
+    border-radius: 5px;
+    background: rgb(190,190,190);
+}
+
+
+QWidget#FileBackupWidget{
+        border-radius:6px;
+        background-color: #FAFDFF;
+}
+
+QWidget#FileRecoveryWidget{
+        border-radius:6px;
+        background-color: #FAFDFF;
+}
+
+
+/* 菜单栏按钮样式 */
+QToolButton#btnFirmwareUpgrade{
+    color: #5E626E;
+    font-size:16px;
+}
+QToolButton#btnFirmwareUpgrade:checked{
+    color: #0047BB;
+    background-color: rgb(250, 253, 255);
+    border-radius: 8px 0px 0px 8px;
+}
+QToolButton#btnFirmwareUpgrade:uncheck{
+    background-color: transparent;
+}
+QToolButton#btnFirmwareUpgrade:disabled{
+    background-color: transparent;
+}
+
+QToolButton#btnFirmwareCheck{
+    color: #5E626E;
+    font-size:16px;
+}
+QToolButton#btnFirmwareCheck:checked{
+    color: #0047BB;
+    background-color: rgb(250, 253, 255);
+    border-radius: 8px 0px 0px 8px;
+}
+QToolButton#btnFirmwareCheck:uncheck{
+    color: #5E626E;
+    background-color: transparent;
+
+}
+QToolButton#btnFirmwareCheck:disabled{
+    color: #5E626E;
+    background-color: transparent;
+}
+
+QToolButton#btnBackup{
+    color: #5E626E;
+    font-size:16px;
+}
+QToolButton#btnBackup:checked{
+    color: #0047BB;
+    background-color: rgb(250, 253, 255);
+    border-radius: 8px 0px 0px 8px;
+}
+QToolButton#btnBackup:uncheck{
+    background-color: transparent;
+
+}
+QToolButton#btnBackup:disabled{
+    background-color: transparent;
+}
+
+
+QToolButton#btnSystemTool{
+    color: #5E626E;
+    font-size:16px;
+}
+QToolButton#btnSystemTool:checked{
+    color: #0047BB;
+    background-color: rgb(250, 253, 255);
+    border-radius: 8px 0px 0px 8px;
+}
+QToolButton#btnSystemTool:uncheck{
+    color: #5E626E;
+    background-color: transparent;
+
+}
+QToolButton#btnSystemTool:disabled{
+    color: #5E626E;
+    background-color: transparent;
+}
+
+
+QToolButton#btnServoParams{
+    color: #5E626E;
+    font-size:16px;
+}
+QToolButton#btnServoParams:checked{
+    color: #0047BB;
+    background-color: rgb(250, 253, 255);
+    border-radius: 8px 0px 0px 8px;
+}
+QToolButton#btnServoParams:uncheck{
+    background-color: transparent;
+
+}
+QToolButton#btnServoParams:disabled{
+    background-color: transparent;
+}
+
+/* 伺服参数表格 ------------------------------*/
+QTableView#tableServoParamView {
+    color: #2D3440;                                       /*表格内文字颜色*/
+    border: none;
+    padding: 2px 4px;
+    selection-color: #2D3440;                             /*选中区域的文字颜色*/
+    selection-background-color: rgb(255,255,255);        /*选中区域的背景色*/
+    font-size:16px;
+}
+
+
+
+QPushButton#btnReadAllServoParams
+{
+    font-size: 14px;
+    border-color:#FAFDFF;
+    border: 1px solid #DFE3E5;
+    border-radius: 4px;
+    color: #2D3440;
+    padding-left:6px;
+    padding-right:6px;
+}
+
+QPushButton#btnWriteAllServoParams
+{
+    font-size: 14px;
+    border-color:#FAFDFF;
+    border: 1px solid #DFE3E5;
+    border-radius: 4px;
+    color: #2D3440;
+    padding-left:6px;
+    padding-right:6px;
+}
+
+QPushButton#btnReadPID
+{
+    font-size: 14px;
+    border-color:#FAFDFF;
+    border: 1px solid #DFE3E5;
+    border-radius: 4px;
+    color: #2D3440;
+    padding-left:6px;
+    padding-right:6px;
+}
+
+QPushButton#btnExportExcel
+{
+    font-size: 14px;
+    border-color:#FAFDFF;
+    border: 1px solid #DFE3E5;
+    border-radius: 4px;
+    color: #2D3440;
+}
+
+
+/*--------------------------------------------------- */
+
+
 
 
 

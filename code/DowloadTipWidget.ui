@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>150</height>
+    <width>626</width>
+    <height>487</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -20,88 +20,126 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget{
-  	border: 1px solid #8f8f91;
+   <string notr="true"/>
+  </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QWidget" name="widget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>400</width>
+       <height>250</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>400</width>
+       <height>250</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">.QWidget{
+  	border: none;
   	border-radius:6px;
 	background-color: rgb(255, 255, 255);
 }</string>
-  </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
-    <widget class="QLabel" name="label">
-     <property name="styleSheet">
-      <string notr="true">color: #37475F;
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <property name="leftMargin">
+       <number>20</number>
+      </property>
+      <property name="topMargin">
+       <number>20</number>
+      </property>
+      <property name="rightMargin">
+       <number>20</number>
+      </property>
+      <property name="bottomMargin">
+       <number>20</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="styleSheet">
+         <string notr="true">color: #37475F;
 border:none;</string>
-     </property>
-     <property name="text">
-      <string>提示：可以下载最新软件
+        </property>
+        <property name="text">
+         <string>提示：可以下载最新软件
 以下为最新下载地址</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QTextEdit" name="textDownloadURL">
-     <property name="styleSheet">
-      <string notr="true">QTextEdit{
-	border: 1px solid #C6C9D7;
-	border-radius: 6px;
-	line-height: 24px;
-	font-size: 14px;
-	color: #5F6C7F;
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextEdit" name="textDownloadURL">
+        <property name="styleSheet">
+         <string notr="true">QTextEdit{
+color: #A6AEBA;
+border: 0.5px solid #C6C9D7;
+border-radius: 4px;
+padding-left:18px;
+font-size: 16px;
+font-weight: normal;
 }
+
 QScrollBar{
     background: transparent;
-	border-radius:16px;
+	border-radius:3px;
     width: 6px;
 }
 QScrollBar::handle:vertical {
 	background-color: #e0e0e0;
     min-height: 30px;
-	border-radius:16px;
+	border-radius:3px;
 	width: 6px;
-}
-</string>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item alignment="Qt::AlignHCenter">
-    <widget class="QPushButton" name="btnConfirm">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="minimumSize">
-      <size>
-       <width>70</width>
-       <height>0</height>
-      </size>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton{
-	width: 54px;
-	height: 20px;
-	background: #0172e5;
-	border-radius: 4px;
-	color: #FFFFFF;
-}
-QPushButton::pressed{
-	background: #0172e5;
-}
-QPushButton::disabled{
-	background: rgb(55, 71, 95);
 }</string>
-     </property>
-     <property name="text">
-      <string>确认</string>
-     </property>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QPushButton" name="btnConfirm">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>120</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>120</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border-radius: 3px;
+opacity: 1;
+border:none;
+background: #0047BB;
+color: #FAFDFF;
+font-size: 16px;
+font-weight: 350;
+</string>
+        </property>
+        <property name="text">
+         <string>确认</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

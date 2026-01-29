@@ -1,0 +1,7 @@
+.LoadingUI
+{
+    border: 1px solid #8f8f91;
+    border-radius:6px;
+    background-color: rgba(31, 41, 52,0.2);
+}
+

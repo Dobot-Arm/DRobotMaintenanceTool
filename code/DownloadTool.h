@@ -23,6 +23,7 @@ public:
     ~DownloadTool();
 
     void startDownload(const QString& downloadUrl,QString savePath);  // 开始下载文件
+    void startDownloadFile(const QString& downloadUrl,QString strSaveFile);  // 开始下载文件
     void cancelDownload(); // 取消下载文件
 
 signals:

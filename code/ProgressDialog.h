@@ -6,11 +6,12 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QGraphicsDropShadowEffect>
+#include "baseUI/UIBaseWidget.h"
 namespace Ui {
 class ProgressDialog;
 }
 
-class ProgressDialog : public QDialog
+class ProgressDialog : public UIBaseWidget
 {
     Q_OBJECT
 
@@ -22,7 +23,7 @@ public:
     void setProgressValue(int progress);
     void setHeadLabel(QString text);
     void setTitle(QString title);
-    void setDownloadProgress(int progress,int total);
+    void setInitProgressValue(int progress);
     bool event(QEvent *event);
 public slots:
     void slot_progressConfirm();

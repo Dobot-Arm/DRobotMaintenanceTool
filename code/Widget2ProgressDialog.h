@@ -10,13 +10,12 @@
 #include <QMouseEvent>
 #include <QLabel>
 #include <QDebug>
-#include "ShadowWindow.h"
-#include "MessageWidget.h"
+#include "baseUI/UIBaseWidget.h"
 namespace Ui {
 class Widget2ProgressDialog;
 }
 
-class Widget2ProgressDialog : public QWidget
+class Widget2ProgressDialog : public UIBaseWidget
 {
     Q_OBJECT
 
@@ -31,6 +30,7 @@ public:
     void setTitle(QString title);
     void setDownloadProgress(int progress,int total);
 
+    void show();
 public slots:
     void slot_progressConfirm();
 

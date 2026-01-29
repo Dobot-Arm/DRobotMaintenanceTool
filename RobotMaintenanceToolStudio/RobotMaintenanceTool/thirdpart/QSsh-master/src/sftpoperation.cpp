@@ -27,6 +27,8 @@
 
 #include "sftpoutgoingpacket_p.h"
 
+#include <QIODevice>
+#include <QBuffer>
 #include <QFile>
 
 namespace QSsh {
@@ -143,7 +145,7 @@ SftpOutgoingPacket & SftpCreateFile::initialPacket(SftpOutgoingPacket &packet)
 const int AbstractSftpTransfer::MaxInFlightCount = 10; // Experimentally found to be enough.
 
 AbstractSftpTransfer::AbstractSftpTransfer(SftpJobId jobId, const QString &remotePath,
-    const QSharedPointer<QFile> &localFile)
+    const QSharedPointer<QIODevice> &localFile)
     : AbstractSftpOperationWithHandle(jobId, remotePath),
       localFile(localFile), fileSize(0), offset(0), inFlightCount(0),
       statRequested(false)
@@ -167,7 +169,7 @@ void AbstractSftpTransfer::calculateInFlightCount(quint32 chunkSize)
 
 
 SftpDownload::SftpDownload(SftpJobId jobId, const QString &remotePath,
-    const QSharedPointer<QFile> &localFile)
+    const QSharedPointer<QIODevice> &localFile)
     : AbstractSftpTransfer(jobId, remotePath, localFile), eofId(SftpInvalidJob)
 {
 }
@@ -180,7 +182,7 @@ SftpOutgoingPacket &SftpDownload::initialPacket(SftpOutgoingPacket &packet)
 
 
 SftpUploadFile::SftpUploadFile(SftpJobId jobId, const QString &remotePath,
-    const QSharedPointer<QFile> &localFile, SftpOverwriteMode mode,
+    const QSharedPointer<QIODevice> &localFile, SftpOverwriteMode mode,
     const SftpUploadDir::Ptr &parentJob)
     : AbstractSftpTransfer(jobId, remotePath, localFile),
       parentJob(parentJob), mode(mode)
@@ -192,25 +194,29 @@ SftpOutgoingPacket &SftpUploadFile::initialPacket(SftpOutgoingPacket &packet)
 {
     state = OpenRequested;
     quint32 permissions = 0;
-    const QFile::Permissions &qtPermissions = localFile->permissions();
-    if (qtPermissions & QFile::ExeOther)
-        permissions |= 1 << 0;
-    if (qtPermissions & QFile::WriteOther)
-        permissions |= 1 << 1;
-    if (qtPermissions & QFile::ReadOther)
-        permissions |= 1 << 2;
-    if (qtPermissions & QFile::ExeGroup)
-        permissions |= 1<< 3;
-    if (qtPermissions & QFile::WriteGroup)
-        permissions |= 1<< 4;
-    if (qtPermissions & QFile::ReadGroup)
-        permissions |= 1<< 5;
-    if (qtPermissions & QFile::ExeOwner)
-        permissions |= 1<< 6;
-    if (qtPermissions & QFile::WriteOwner)
-        permissions |= 1<< 7;
-    if (qtPermissions & QFile::ReadOwner)
-        permissions |= 1<< 8;
+    if (0 == strcmp(QFile::staticMetaObject.className(),localFile->metaObject()->className())){
+        const QFile::Permissions &qtPermissions = localFile.staticCast<QFile>()->permissions();
+        if (qtPermissions & QFile::ExeOther)
+            permissions |= 1 << 0;
+        if (qtPermissions & QFile::WriteOther)
+            permissions |= 1 << 1;
+        if (qtPermissions & QFile::ReadOther)
+            permissions |= 1 << 2;
+        if (qtPermissions & QFile::ExeGroup)
+            permissions |= 1<< 3;
+        if (qtPermissions & QFile::WriteGroup)
+            permissions |= 1<< 4;
+        if (qtPermissions & QFile::ReadGroup)
+            permissions |= 1<< 5;
+        if (qtPermissions & QFile::ExeOwner)
+            permissions |= 1<< 6;
+        if (qtPermissions & QFile::WriteOwner)
+            permissions |= 1<< 7;
+        if (qtPermissions & QFile::ReadOwner)
+            permissions |= 1<< 8;
+    }else{
+        permissions = SftpOutgoingPacket::DefaultPermissions;
+    }
     return packet.generateOpenFileForWriting(remotePath, mode, permissions, jobId);
 }
 

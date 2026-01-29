@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>350</width>
-    <height>250</height>
+    <width>533</width>
+    <height>377</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,23 +18,25 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>350</width>
-    <height>250</height>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>16777215</width>
+    <height>16777215</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QWidget{
-  	border: 1px solid #8f8f91;
-  	border-radius:6px;
-	background-color: rgb(255, 255, 255);
-}</string>
+   <string notr="true"/>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item alignment="Qt::AlignRight">
-    <widget class="QPushButton" name="btnClose">
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
+    <widget class="QWidget" name="widget" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
@@ -43,93 +45,98 @@
      </property>
      <property name="minimumSize">
       <size>
-       <width>11</width>
-       <height>11</height>
+       <width>464</width>
+       <height>184</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
-       <width>11</width>
-       <height>11</height>
+       <width>464</width>
+       <height>184</height>
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true">QPushButton{
-border-image: url(:/image/images/icon_close_dialog.png);
-color: gray;
-}
-
-QPushButton:hover{
-border-image: url(:/image/images/icon_close_hover.png);
-
-}
-
-QPushButton:pressed{
-border-image: url(:/image/images/icon_close_press.png);
-}</string>
+      <string notr="true">background-color: rgb(250, 253, 255);
+border-radius: 6px;</string>
      </property>
-     <property name="text">
-      <string/>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QLabel" name="labelMessage">
-       <property name="font">
-        <font>
-         <family>Microsoft YaHei UI</family>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true">border:none;
-color: rgb(255, 255, 255);</string>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-       <property name="wordWrap">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item alignment="Qt::AlignHCenter">
-    <widget class="QPushButton" name="btnConfirm">
-     <property name="minimumSize">
-      <size>
-       <width>70</width>
-       <height>25</height>
-      </size>
-     </property>
-     <property name="font">
-      <font>
-       <family>Microsoft YaHei UI</family>
-      </font>
-     </property>
-     <property name="styleSheet">
-      <string notr="true">QPushButton{
-	width: 54px;
-	height: 20px;
-	background: #0172e5;
-	border-radius: 4px;
-	color: #FFFFFF;
-}
-QPushButton::pressed{
-	background: #0172e5;
-}
-QPushButton::disabled{
-	background: rgb(55, 71, 95);
-}</string>
-     </property>
-     <property name="text">
-      <string>确认</string>
-     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>56</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>56</number>
+      </property>
+      <property name="bottomMargin">
+       <number>32</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="labelMessage">
+        <property name="font">
+         <font>
+          <family>Arial</family>
+          <pointsize>-1</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border:none;
+color: rgb(255, 255, 255);
+font-size:16px;
+font-weight: normal;</string>
+        </property>
+        <property name="text">
+         <string>测试字体样式</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item alignment="Qt::AlignHCenter">
+       <widget class="QPushButton" name="btnConfirm">
+        <property name="minimumSize">
+         <size>
+          <width>100</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>40</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>Microsoft YaHei UI</family>
+          <pointsize>-1</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background: #0047BB;
+border-radius: 3px;
+font-size: 16px;
+font-weight: normal;
+color: #FAFDFF;</string>
+        </property>
+        <property name="text">
+         <string>确认</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

@@ -84,8 +84,83 @@
         <file>images2/shawdow_straight.png</file>
         <file>images2/servo_single_all_expand.png</file>
         <file>images2/servo_single_all_normal.png</file>
+        <file>images2/icon_servoParamPasswordWarn.png</file>
+        <file>images2/icon_servoParamChecked.png</file>
+        <file>images2/icon_servoParamUncheck.png</file>
+        <file>images2/icon_servoParamFailed.png</file>
+        <file>images2/icon_servoParamSuccess.png</file>
+        <file>images2/icon_fileRecoveryWarn.png</file>
+        <file>images/004.png</file>
+        <file>images/005.png</file>
+        <file>images/006.png</file>
+        <file>images/007.png</file>
+        <file>images/arrow.png</file>
+        <file>images/chinese.png</file>
+        <file>images/close.png</file>
+        <file>images/collapse_arrow.png</file>
+        <file>images/detail.png</file>
+        <file>images/device.png</file>
+        <file>images/device_searching.png</file>
+        <file>images/download_click.png</file>
+        <file>images/download_disable.png</file>
+        <file>images/download_hover.png</file>
+        <file>images/download_normal.png</file>
+        <file>images/english.png</file>
+        <file>images/filebackup.png</file>
+        <file>images/filebackup_selected.png</file>
+        <file>images/firmwareupgrade.png</file>
+        <file>images/icon_do_disable.png</file>
+        <file>images/icon_doFailed.png</file>
+        <file>images/icon_doing.png</file>
+        <file>images/Icon_doingFailed_big.png</file>
+        <file>images/Icon_doingSuccessed_big.png</file>
+        <file>images/icon_doSuccessed.png</file>
+        <file>images/icon_export_toolLogs.png</file>
+        <file>images/icon_popover_close.png</file>
+        <file>images/icon_pull_normal.png</file>
+        <file>images/icon_pull_press.png</file>
+        <file>images/icon_servoParamChecked.png</file>
+        <file>images/icon_servoParamUncheck.png</file>
+        <file>images/icon_single_radioCheck.png</file>
+        <file>images/icon_single_radioUnCheck.png</file>
+        <file>images/icon_single_upgrade_close.png</file>
+        <file>images/icon_upgrade_download.png</file>
+        <file>images/icon_upgrade_import.png</file>
+        <file>images/icon_upgrade_mini.png</file>
+        <file>images/import_click.png</file>
+        <file>images/import_disable.png</file>
+        <file>images/import_hover.png</file>
+        <file>images/import_normal.png</file>
+        <file>images/loading.gif</file>
+        <file>images/max.png</file>
+        <file>images/max_restore.png</file>
+        <file>images/min.png</file>
+        <file>images/servoparam.png</file>
+        <file>images/servoparam_selected.png</file>
+        <file>images/single_upgrade_import.png</file>
+        <file>images/small_error.png</file>
+        <file>images/small_sccess.png</file>
+        <file>images/SNRepairWarn.png</file>
+        <file>images/system_tool.png</file>
+        <file>images/system_tool_selected.png</file>
+        <file>images/warnicon.png</file>
+        <file>images/myapp.ico</file>
+        <file>images/export.png</file>
+        <file>images/normal_triangle.png</file>
+        <file>images/select_triangle.png</file>
+        <file>images/menu_download.png</file>
+        <file>images/menu_undownload.png</file>
+        <file>images/tipserror.png</file>
+        <file>images/tipsok.png</file>
+        <file>images/tipswarn.png</file>
     </qresource>
     <qresource prefix="/qss">
         <file>myqss/mainwidget.qss</file>
+        <file>myqss/SNAlarmBubbleTipWidget.qss</file>
+        <file>myqss/MaskDialogContainer.qss</file>
+        <file>myqss/LoadingUI.qss</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>luaJson.lua</file>
     </qresource>
 </RCC>

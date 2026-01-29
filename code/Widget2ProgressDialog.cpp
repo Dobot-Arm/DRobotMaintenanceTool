@@ -2,27 +2,26 @@
 #include "ui_Widget2ProgressDialog.h"
 
 Widget2ProgressDialog::Widget2ProgressDialog(QWidget *parent) :
-    QWidget(parent),
+    UIBaseWidget(parent),
     ui(new Ui::Widget2ProgressDialog)
 {
     ui->setupUi(this);
-    QWidget::setAttribute(Qt::WA_QuitOnClose,false);
-    connect(ui->btnConfirm,&QPushButton::clicked,this,&Widget2ProgressDialog::slot_progressConfirm);
-    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint );//无边框，置顶
-    setWindowModality(Qt::ApplicationModal); //禁用主窗口
+    QWidget::setAttribute(Qt::WA_DeleteOnClose,true);
+    setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint |Qt::WindowSystemMenuHint);   //设置无边框,置顶
+    setWindowModality(Qt::ApplicationModal);      //禁用主窗口
+    setStyleSheet("background-color: rgba(0, 0, 0, 100);");
     ui->btnClose->hide();
-//    connect(ui->btnClose,&QPushButton::clicked,this,&Widget2ProgressDialog::slot_closeDialog);
+    connect(ui->btnClose,&QPushButton::clicked,this,&Widget2ProgressDialog::close);
+    connect(ui->btnConfirm,&QPushButton::clicked,this,&Widget2ProgressDialog::close);
     ui->btnConfirm->hide();
     ui->labelDownloadCase->hide();
     ui->labelDownloadSpeed->hide();
-
 }
 
 Widget2ProgressDialog::~Widget2ProgressDialog()
 {
     delete ui;
 }
-
 
 void Widget2ProgressDialog::setProgressRange(int range)
 {
@@ -108,19 +107,18 @@ void Widget2ProgressDialog::setHeadLabel(QString text)
     if(text.contains("export")){
         ui->labelProgress->setText(tr("日志导出中..."));
     }
-
-
 }
 
 void Widget2ProgressDialog::setTitle(QString title)
 {
-//    if(title.contains("成功")||title.contains("success")){
-
-//    }
-
     ui->labelTitle->setText(title);
 }
 
+void Widget2ProgressDialog::show()
+{
+    raise();
+    QWidget::show();
+}
 
 void Widget2ProgressDialog::slot_progressConfirm()
 {

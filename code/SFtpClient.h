@@ -52,7 +52,7 @@ signals:
     void signalConnectHost(SFtpConnectParam prm,QPrivateSignal);
     void signalDisConnectHost(QPrivateSignal);
     void signalOnChannelFileInfoAvailableFinish(qint64 job, const QList<QSsh::SftpFileInfo> &fileInfoList);
-    void signalFinishedJob(qint64 id,bool bOk, QString strErrMsg);
+    void signalFinishedJob(qint64 id, const QList<QSsh::SftpFileInfo> &fileInfoList,bool bOk, QString strErrMsg);
 
     void signalConnected();
     void signalDisconnected();
@@ -85,6 +85,7 @@ private:
     bool m_bIsBusy;
     QHash<QSsh::SftpJobId,qint64> m_cacheJobId;
     QMutex m_mtx;
+    QList<QSsh::SftpFileInfo> m_fileInfoList;
 };
 
 #endif // CSFTPCLIENT_H

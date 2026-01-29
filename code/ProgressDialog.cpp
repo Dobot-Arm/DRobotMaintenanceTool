@@ -2,8 +2,7 @@
 #include "ui_ProgressDialog.h"
 
 ProgressDialog::ProgressDialog(QWidget *parent) :
-    QDialog(parent),
-    mouse_press(false),
+    UIBaseWidget(parent),
     ui(new Ui::ProgressDialog)
 {
     ui->setupUi(this);
@@ -12,23 +11,12 @@ ProgressDialog::ProgressDialog(QWidget *parent) :
     setWindowFlags(Qt::FramelessWindowHint | Qt::WindowSystemMenuHint );//无边框，置顶
     setWindowModality(Qt::ApplicationModal); //禁用主窗口
     connect(ui->btnClose,&QPushButton::clicked,this,&ProgressDialog::slot_closeDialog);
+    setStyleSheet("background-color: rgba(0, 0, 0, 100);");
     ui->btnConfirm->hide();
     ui->labelDownloadCase->hide();
     ui->labelDownloadSpeed->hide();
     ui->labelProgress->hide();
     ui->btnClose->hide();
-//    // 2、设置阴影边框;
-//    shadowEffect = new QGraphicsDropShadowEffect(this);
-//    // 阴影偏移
-//    shadowEffect->setOffset(0, 0);
-//    // 阴影颜色;
-//    shadowEffect->setColor(QColor(0, 0, 0, 60));
-//    // 阴影半径;
-//    shadowEffect->setBlurRadius(18);
-//    // 给窗口设置上当前的阴影效果;
-//    this->setGraphicsEffect(shadowEffect);
-//    this->setAttribute(Qt::WA_TranslucentBackground);
-//    this->setContentsMargins(6,6,3,3);
 }
 
 ProgressDialog::~ProgressDialog()
@@ -75,7 +63,7 @@ void ProgressDialog::setHeadLabel(QString text)
         ui->labelProgress->setText(tr("下载中"));
         return;
     }
-    if(text.contains("success")||text.contains("fail")){
+    if(text.contains("success")){
         ui->btnConfirm->show();
 //        ui->btnClose->show();
         ui->progressBar->setStyleSheet("QProgressBar { /* all types of tool button */\n  border: none;\n  border-radius: 10px;\n  text-align: top;\n background: rgba(55,71,95,25);\n}\nQProgressBar::chunk\n{\n	border-radius: 10px;\n	background-color: #3EB72A;\n}");
@@ -83,6 +71,7 @@ void ProgressDialog::setHeadLabel(QString text)
         return;
     }
     if(text.contains("fail")){
+        ui->btnConfirm->show();
         ui->progressBar->setStyleSheet("QProgressBar { /* all types of tool button */\n  border: none;\n  border-radius: 10px;\n  text-align: top;\n background: rgba(55,71,95,25);\n}\nQProgressBar::chunk\n{\n	border-radius: 10px;\n	background-color: #CE4949;\n}");
         ui->labelProgress->setText(ui->labelTitle->text());
         return;
@@ -93,22 +82,16 @@ void ProgressDialog::setHeadLabel(QString text)
         ui->labelDownloadCase->hide();
         ui->labelDownloadSpeed->hide();
     }
-
-
 }
 
 void ProgressDialog::setTitle(QString title)
 {
-//    if(title.contains("成功")||title.contains("success")){
-
-//    }
-
     ui->labelTitle->setText(title);
 }
 
-void ProgressDialog::setDownloadProgress(int progress, int total)
+void ProgressDialog::setInitProgressValue(int progress)
 {
-
+    ui->progressBar->setValue(progress);
 }
 
 bool ProgressDialog::event(QEvent *event)
@@ -119,33 +102,6 @@ bool ProgressDialog::event(QEvent *event)
     }
     return QWidget::event(event);
 }
-
-//void ProgressDialog::mousePressEvent(QMouseEvent *e)
-//{
-//    if(e->button()==Qt::LeftButton
-//      && e->x() < this->width()
-//      && e->y() < this->height())
-//    {
-//        this->setCursor(Qt::ClosedHandCursor);
-//        mouse_press = true;
-//    }
-//    move_point=e->globalPos()-this->pos();
-//}
-
-//void ProgressDialog::mouseMoveEvent(QMouseEvent *e)
-//{
-//    if(mouse_press)
-//    {
-//        QPoint move_pos=e->globalPos();
-//        this->move(move_pos-move_point);
-//    }
-//}
-
-//void ProgressDialog::mouseReleaseEvent(QMouseEvent *e)
-//{
-//    mouse_press = false;
-//    this->setCursor(Qt::ArrowCursor);
-//}
 
 void ProgressDialog::slot_progressConfirm()
 {

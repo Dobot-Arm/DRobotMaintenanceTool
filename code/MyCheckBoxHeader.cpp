@@ -1,13 +1,12 @@
 #include "MyCheckBoxHeader.h"
 
 
-
 MyCheckBoxHeader::MyCheckBoxHeader(Qt::Orientation orientation, QWidget* parent /*= 0*/)
     : QHeaderView(orientation, parent)
 {
     this->setSectionsMovable(true);
     this->setFirstSectionMovable(true);
-    isChecked_ = true;
+    isChecked_ = false;
 }
 
 void MyCheckBoxHeader::paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const
@@ -18,30 +17,29 @@ void MyCheckBoxHeader::paintSection(QPainter* painter, const QRect& rect, int lo
 
     if (logicalIndex == colIsCheck)
     {
+
         QStyleOptionButton option;
-
-        option.rect = QRect(rect.left()+1,rect.y()+5,15,15);
-
         option.state = QStyle::State_Enabled | QStyle::State_Active;
-
         if (isChecked_)
             option.state |= QStyle::State_On;
         else
             option.state |= QStyle::State_Off;
-        option.state |= QStyle::State_Off;
-
-        style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, painter);
+        option.rect = rect;
+        QCheckBox checkBox;
+        style()->drawPrimitive(QStyle::PE_IndicatorCheckBox, &option, painter, &checkBox);
     }
 }
 
 void MyCheckBoxHeader::mousePressEvent(QMouseEvent* event)
 {
-    if(this->logicalIndexAt(event->pos())==colIsCheck)
+    if((event->buttons() & Qt::LeftButton) && this->logicalIndexAt(event->pos())==colIsCheck)
     {
         setIsChecked(!isChecked());
-
         emit checkBoxClicked(isChecked());
-
+    }
+    else
+    {
+        QHeaderView::mousePressEvent(event);
     }
 
 }
