@@ -1,0 +1,11 @@
+Company:Shenzhen Dobot Corp Ltd
+
+Website: https://www.dobot-robots.com
+
+Based On Qt Framework:
+    1. License: LGPLv3
+    2. Source Code:https://www.qt.io/download
+    
+Open source: https://github.com/Dobot-Arm/DRobotMaintenanceTool
+
+ 2026 Dobot All Rights Reserved. 
